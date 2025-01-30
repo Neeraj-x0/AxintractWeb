@@ -3,15 +3,36 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F1F1F1; /* Light background */
+  --foreground: #202020; /* Dark text */
+  --accent-primary: #1C4E80; /* Strong blue for buttons, links */
+  --accent-secondary: #A5D8DD; /* Light blue for highlights */
+  --call-to-action: #EA6A47; /* Warm orange for important buttons */
+  --muted: #7E909A; /* Muted color for borders, secondary text */
+  --highlight: #0091D5; /* Strong blue for focused elements */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #fafafa; /* Dark background */
+    --foreground: #F1F1F1; /* Light text */
+    --accent-primary: #7E909A; /* Muted primary color in dark mode */
+    --accent-secondary: #1C4E80; /* Strong blue for dark mode */
+    --call-to-action: #A5D8DD; /* Light blue for buttons */
+    --muted: #F1F1F1; /* Lighter muted color in dark mode */
+    --highlight: #EA6A47; /* Orange focus in dark mode */
   }
+}
+
+/* Enable smooth scrolling globally */
+html {
+  scroll-behavior: smooth;
+  
+}
+
+/* Optionally, add smooth scrolling to specific containers */
+.scrollable-container {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -19,3 +40,66 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Main scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;  /* For horizontal scrollbars */
+}
+
+/* Track styling */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 5px;
+}
+
+/* Handle styling */
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 5px;
+  border: 2px solid #f1f1f1;
+  transition: background-color 0.2s ease;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Handle when active/clicking */
+::-webkit-scrollbar-thumb:active {
+  background: #909090;
+}
+
+/* Corner styling where vertical and horizontal scrollbars meet */
+::-webkit-scrollbar-corner {
+  background: #f1f1f1;
+}
+
+
+.fadeIn {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.fadeOut {
+  animation: fadeOut 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
