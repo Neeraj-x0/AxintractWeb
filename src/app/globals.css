@@ -3,31 +3,54 @@
 @tailwind utilities;
 
 :root {
-  --background: #F1F1F1; /* Light background */
-  --foreground: #202020; /* Dark text */
-  --accent-primary: #1C4E80; /* Strong blue for buttons, links */
-  --accent-secondary: #A5D8DD; /* Light blue for highlights */
-  --call-to-action: #EA6A47; /* Warm orange for important buttons */
-  --muted: #7E909A; /* Muted color for borders, secondary text */
-  --highlight: #0091D5; /* Strong blue for focused elements */
+  --background: #F1F1F1;
+  /* Light background */
+  --foreground: #202020;
+  /* Dark text */
+  --accent-primary: #1C4E80;
+  /* Strong blue for buttons, links */
+  --accent-secondary: #A5D8DD;
+  /* Light blue for highlights */
+  --call-to-action: #EA6A47;
+  /* Warm orange for important buttons */
+  --muted: #7E909A;
+  /* Muted color for borders, secondary text */
+  --highlight: #0091D5;
+  /* Strong blue for focused elements */
+}
+
+:root {
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+}
+
+[data-theme="dark"] {
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 0 0% 100%;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #fafafa; /* Dark background */
-    --foreground: #F1F1F1; /* Light text */
-    --accent-primary: #7E909A; /* Muted primary color in dark mode */
-    --accent-secondary: #1C4E80; /* Strong blue for dark mode */
-    --call-to-action: #A5D8DD; /* Light blue for buttons */
-    --muted: #F1F1F1; /* Lighter muted color in dark mode */
-    --highlight: #EA6A47; /* Orange focus in dark mode */
+    --background: #fafafa;
+    /* Dark background */
+    --foreground: #F1F1F1;
+    /* Light text */
+    --accent-primary: #7E909A;
+    /* Muted primary color in dark mode */
+    --accent-secondary: #1C4E80;
+    /* Strong blue for dark mode */
+    --call-to-action: #A5D8DD;
+    /* Light blue for buttons */
+    --muted: #F1F1F1;
+    /* Lighter muted color in dark mode */
+    --highlight: #EA6A47;
+    /* Orange focus in dark mode */
   }
 }
 
 /* Enable smooth scrolling globally */
 html {
   scroll-behavior: smooth;
-  
 }
 
 /* Optionally, add smooth scrolling to specific containers */
@@ -36,7 +59,7 @@ html {
 }
 
 body {
-  color: var(--foreground);
+  color: rgb(17 24 39);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -44,7 +67,8 @@ body {
 /* Main scrollbar styling */
 ::-webkit-scrollbar {
   width: 10px;
-  height: 10px;  /* For horizontal scrollbars */
+  height: 10px;
+  /* For horizontal scrollbars */
 }
 
 /* Track styling */
@@ -78,7 +102,7 @@ body {
 
 
 .fadeIn {
-  animation: fadeIn 0.5s ease-in-out;
+  animation: fadeIn 0.2s ease-in-out;
 }
 
 .fadeOut {
@@ -89,6 +113,7 @@ body {
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -98,8 +123,192 @@ body {
   0% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
   }
 }
 
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
+
+
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Animation Classes */
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.animate-slideDown {
+  animation: slideDown 0.5s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.5s ease-out;
+}
+
+/* Card Hover Effects */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Input Focus Styles */
+.input-focus {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-focus:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+/* Button Hover Effects */
+.button-hover {
+  transition: all 0.2s ease;
+}
+
+.button-hover:hover {
+  transform: translateY(-1px);
+}
+
+/* Smooth List Transitions */
+.list-transition {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Add a subtle gradient animation to the background */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-bg {
+  background: linear-gradient(-45deg, #f3f4f6, #ffffff, #f3f4f6);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+/* Option 1: Simple height transition */
+.smooth-height {
+  transition: height 0.3s ease-in-out, padding 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+/* Option 2: More comprehensive animation */
+.animate-resize {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top;
+  overflow: hidden;
+}
+
+/* Option 3: Enhanced animation with scale */
+.content-transition {
+  animation: resize 0.3s ease-out forwards;
+  transform-origin: top;
+  overflow: hidden;
+}
+
+@keyframes resize {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Option 4: Fade and expand */
+.expand-animation {
+  transition: max-height 0.3s ease-out, opacity 0.2s ease-out, transform 0.2s ease-out;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
+  overflow: hidden;
+}
+
+.expand-animation.show {
+  max-height: 1000px; /* Adjust based on your content */
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -1,79 +1,89 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Avatar from "@/components/ui/avatar";
 import {
-  Phone,
-  Mail,
   MessageCircle,
+  
   FileText,
   Bell,
   Clock,
   BarChart,
   Download,
-  DollarSign,
-  Video,
   Users,
   ArrowUpRight,
-  Delete,
+  Trash,
   ChevronDown,
+  Reply,
+  ListChecks,
+  Calendar,
+  Loader2,
 } from "lucide-react";
 import Header from "@/components/Header";
 import { useParams } from "next/navigation";
-import { API_URL, JWT_TOKEN } from "@/constants";
-import axios from "axios";
+import axios from "@/lib";
 import NotFoundPage from "@/components/404";
-import EmailPopup from "@/components/PopUp/EmailPopUp";
-import WhatsAppPopup from "@/components/PopUp/WhatsAppPopup";
+import CommonPopUp from "@/components/PopUp/engagement/CommonPopup";
+import { useMessageHistory } from "@/hooks/useHistory";
+import MessageTracker from "@/components/engagement/MessageTracker";
+import { Alert } from "@/components/ui/alert";
 
-const LeadManagement = () => {
-  const [lead, setLead] = useState({
+const EngagementDetails = () => {
+  const [engagement, setEngagement] = useState({
     id: "",
     name: "",
     status: "",
     category: "",
+    totalMessages: 0,
+    replies: 0,
+    notes: "",
+    lastMessage: null,
   });
 
-  const [categories, setCategories] = useState([]);
-  const [statuses, setStatuses] = useState([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [statuses, setStatuses] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [error, setError] = useState("");
-  
   const [isNotFound, setIsNotFound] = useState(false);
+  const params = useParams();
+  const slug = Array.isArray(params?.slug) ? params.slug[0] : params?.slug;
 
-  // Modal states with type
+  const {
+    messages,
+    loading,
+    error: historyError,
+  } = useMessageHistory({
+    engagementId: slug,
+  });
+
+  // Modal states
   const [activeModal, setActiveModal] = useState({
     isOpen: false,
-    type: "", // "call", "whatsapp", "email", "reminder"
+    type: "", // "message", "email", "reminder", "notes"
   });
 
   const quickActions = useMemo(
     () => [
       {
-        icon: Phone,
-        label: "Schedule Call",
-        color: "bg-blue-50 text-blue-600",
-        type: "call",
-      },
-      {
         icon: MessageCircle,
-        label: "WhatsApp",
-        color: "bg-green-50 text-green-600",
-        type: "whatsapp",
+        label: "Send Message",
+        color: "bg-blue-50 text-blue-600",
+        type: "message",
       },
       {
-        icon: Mail,
-        label: "Send Email",
-        color: "bg-purple-50 text-purple-600",
-        type: "email",
+        icon: Reply,
+        label: "Track Reply",
+        color: "bg-green-50 text-green-600",
+        type: "reply",
       },
       {
         icon: Bell,
-        label: "Add Reminder",
+        label: "Set Reminder",
         color: "bg-yellow-50 text-yellow-600",
         type: "reminder",
       },
@@ -81,31 +91,16 @@ const LeadManagement = () => {
     []
   );
 
-  const handleModalOpen = (type: string) => {
-    setActiveModal({
-      isOpen: true,
-      type,
-    });
-  };
-
-  const handleModalClose = () => {
-    setActiveModal({
-      isOpen: false,
-      type: "",
-    });
-  };
-
-  // Rest of your existing code...
   const actions = useMemo(
     () => [
       {
-        icon: Video,
-        label: "Schedule Demo",
+        icon: ListChecks,
+        label: "Update Status",
         color: "bg-purple-50 text-purple-600",
       },
       {
         icon: FileText,
-        label: "Send Proposal",
+        label: "Add Notes",
         color: "bg-blue-50 text-blue-600",
       },
       {
@@ -119,13 +114,13 @@ const LeadManagement = () => {
         color: "bg-yellow-50 text-yellow-600",
       },
       {
-        icon: Download,
-        label: "Export Data",
+        icon: Calendar,
+        label: "Schedule Follow-up",
         color: "bg-gray-50 text-gray-600",
       },
       {
-        icon: DollarSign,
-        label: "Send Invoice",
+        icon: Download,
+        label: "Export Data",
         color: "bg-indigo-50 text-indigo-600",
       },
     ],
@@ -136,37 +131,30 @@ const LeadManagement = () => {
     () => [
       {
         id: 1,
-        title: "Email Sent",
-        description: "Product demo invitation sent",
+        title: "Message Sent",
+        description: "Follow-up message sent",
         time: "2 hours ago",
       },
       {
         id: 2,
-        title: "Call Scheduled",
-        description: "Call scheduled with product specialist",
+        title: "Status Updated",
+        description: "Engagement status changed to Qualified",
         time: "4 hours ago",
       },
       {
         id: 3,
-        title: "Proposal Sent",
-        description: "Proposal sent to client",
+        title: "Reply Received",
+        description: "Client responded to previous message",
         time: "1 day ago",
       },
     ],
     []
   );
 
-  const params = useParams();
-  const slug = Array.isArray(params?.slug) ? params.slug[0] : params?.slug;
-
   const fetchSettings = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/settings`, {
-        headers: { Authorization: `Bearer ${JWT_TOKEN}` },
-      });
+      const response = await axios.get(`/api/settings`);
       const { categories, statuses } = response.data;
-      console.log("Settings fetched:", categories, statuses);
-
       setCategories(categories);
       setStatuses(statuses);
     } catch (error) {
@@ -175,26 +163,19 @@ const LeadManagement = () => {
     }
   };
 
-  const fetchLead = async () => {
+  const fetchEngagement = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/lead/${slug}`, {
-        headers: { Authorization: `Bearer ${JWT_TOKEN}` },
-      });
-      if (response.request.status === 400) {
-        console.error("Lead not found");
-      }
-      setLead(response.data);
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        console.error("Error fetching lead:", error.response.data);
-        if (error.response.status === 400) {
-          setIsNotFound(true);
-          return;
-        }
+      const response = await axios.get(`/api/engagements/${slug}`);
+      setEngagement(response.data.data);
+    } catch (error: unknown) {
+      if (
+        (error as { response?: { status: number } }).response?.status === 404
+      ) {
+        setIsNotFound(true);
       } else {
-        console.error("Error fetching lead:", error);
+        setError("Failed to fetch engagement details");
       }
-      setError("Failed to fetch lead. Please try again.");
+      console.error("Error fetching engagement:", error);
     } finally {
       setIsLoading(false);
     }
@@ -203,76 +184,41 @@ const LeadManagement = () => {
   useEffect(() => {
     const initializeData = async () => {
       setIsLoading(true);
-      await Promise.all([fetchLead(), fetchSettings()]);
+      await Promise.all([fetchEngagement(), fetchSettings()]);
     };
 
-    initializeData();
-  }, [slug]);
-
-  const handleStatusChange = async (newStatus: string) => {
-    try {
-      setActionLoading(true);
-      const response = await axios.put(
-        `${API_URL}/api/lead/${lead.id}`,
-        { status: newStatus },
-        { headers: { Authorization: `Bearer ${JWT_TOKEN}` } }
-      );
-
-      if (response.status === 200) {
-        setLead((prev) => ({ ...prev, status: newStatus }));
-        setIsStatusDropdownOpen(false);
-        alert("Status updated successfully.");
-      }
-    } catch (error) {
-      setError("Failed to update status. Please try again.");
-      console.error("Error updating status:", error);
-    } finally {
-      setActionLoading(false);
+    if (slug) {
+      initializeData();
     }
-  };
+  }, [slug]);
 
   const handleCategoryChange = async (newCategory: string) => {
     try {
       setActionLoading(true);
-      const response = await axios.put(
-        `${API_URL}/api/lead/${lead.id}`,
-        { category: newCategory },
-        { headers: { Authorization: `Bearer ${JWT_TOKEN}` } }
-      );
-
-      if (response.status === 200) {
-        setLead((prev) => ({ ...prev, category: newCategory }));
-        setIsCategoryDropdownOpen(false);
-        alert("Category updated successfully.");
-      }
+      await axios.post(`/api/engagements/${slug}`, {
+        category: newCategory,
+      });
+      setEngagement((prev) => ({ ...prev, category: newCategory }));
+      setIsCategoryDropdownOpen(false);
     } catch (error) {
-      setError("Failed to update category. Please try again.");
+      setError("Failed to update category");
       console.error("Error updating category:", error);
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleDeleteLead = async () => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this lead? This action cannot be undone."
-      )
-    ) {
+  const handleDeleteEngagement = async () => {
+    if (!window.confirm("Are you sure you want to delete this engagement?")) {
       return;
     }
     try {
       setActionLoading(true);
-      const response = await axios.delete(`${API_URL}/api/lead/${lead.id}`, {
-        headers: { Authorization: `Bearer ${JWT_TOKEN}` },
-      });
-      if (response.status === 200) {
-        alert("Lead deleted successfully.");
-        window.location.href = "/";
-      }
+      await axios.delete(`/api/engagements/${slug}`);
+      window.location.href = "/engagements";
     } catch (error) {
-      setError("Failed to delete lead. Please try again.");
-      console.error("Error deleting lead:", error);
+      setError("Failed to delete engagement");
+      console.error("Error deleting engagement:", error);
     } finally {
       setActionLoading(false);
     }
@@ -290,13 +236,16 @@ const LeadManagement = () => {
     );
   }
 
-  const currentLead = {
-    ...lead,
-    company: "Tech Corp",
-    priority: "High Priority",
-    engagementScore: 85,
-    responseRate: "92%",
-    lastContact: "2d ago",
+  const currentEngagement = {
+    ...engagement,
+    engagementScore:
+      Math.round((engagement.replies / engagement.totalMessages) * 100) || 0,
+    responseRate: `${
+      Math.round((engagement.replies / engagement.totalMessages) * 100) || 0
+    }%`,
+    lastContact: engagement.lastMessage
+      ? new Date(engagement.lastMessage).toLocaleDateString()
+      : "Never",
   };
 
   return (
@@ -311,48 +260,27 @@ const LeadManagement = () => {
 
             <Card className="border-none shadow-lg">
               <CardContent className="p-6">
+                {/* Header Section */}
                 <div className="flex items-center justify-between text-gray-900 py-6">
                   <div className="flex items-center space-x-4">
                     <Avatar className="w-16 h-16" />
                     <div>
                       <h2 className="text-2xl font-bold text-gray-900">
-                        {lead.name}
+                        {engagement.name}
                       </h2>
                       <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <span>{lead.category}</span>
+                        <span>{engagement.category}</span>
                         <span>•</span>
-                        <span className="text-indigo-600">{lead.status}</span>
+                        <span className="text-indigo-600">
+                          {engagement.status}
+                        </span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="relative">
-                      <Button
-                        variant="outline"
-                        className="hover:bg-green-50"
-                        onClick={() =>
-                          setIsStatusDropdownOpen(!isStatusDropdownOpen)
-                        }
-                        disabled={actionLoading}
-                      >
-                        Update Status
-                        <ChevronDown className="w-4 h-4 ml-2" />
-                      </Button>
-                      {isStatusDropdownOpen && (
-                        <div className="absolute z-10 mt-2 w-48 bg-white border rounded shadow-lg">
-                          {statuses.map((status) => (
-                            <div
-                              key={status}
-                              onClick={() => handleStatusChange(status)}
-                              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                            >
-                              {status}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
 
+                  {/* Action Buttons */}
+                  <div className="flex items-center space-x-3">
+                    {/* Category Dropdown */}
                     <div className="relative">
                       <Button
                         className="bg-indigo-600 hover:bg-indigo-700 text-white"
@@ -380,22 +308,26 @@ const LeadManagement = () => {
                       )}
                     </div>
 
+                    {/* Delete Button */}
                     <Button
                       className="bg-red-600 hover:bg-red-700 text-white"
-                      onClick={handleDeleteLead}
+                      onClick={handleDeleteEngagement}
                       disabled={actionLoading}
                     >
-                      <Delete className="w-4 h-4 mr-2" />
-                      Delete Lead
+                      <Trash className="w-4 h-4 mr-2" />
+                      Delete
                     </Button>
                   </div>
                 </div>
 
+                {/* Quick Actions */}
                 <div className="grid grid-cols-2 max-w-[50vw] md:grid-cols-4 gap-4">
                   {quickActions.map((action, index) => (
                     <button
                       key={index}
-                      onClick={() => handleModalOpen(action.type)}
+                      onClick={() =>
+                        setActiveModal({ isOpen: true, type: action.type })
+                      }
                       className="flex items-center p-4 rounded-lg hover:bg-gray-50 transition-colors"
                     >
                       <div className={`p-3 rounded-lg ${action.color} mr-3`}>
@@ -410,18 +342,6 @@ const LeadManagement = () => {
               </CardContent>
             </Card>
 
-           
-            <EmailPopup
-              isOpen={(activeModal.isOpen && activeModal.type === "email") || false}
-              onClose={handleModalClose}
-              clientId={slug || ''}
-            />
-            <WhatsAppPopup
-              isOpen={(activeModal.isOpen && activeModal.type === "whatsapp") || false}
-              onClose={handleModalClose}
-              clientId={slug || ''}
-            />
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Action Center */}
               <Card className="md:col-span-2">
@@ -433,7 +353,6 @@ const LeadManagement = () => {
                     {actions.map((action, index) => (
                       <button
                         key={index}
-                        onClick={() => console.log(`${action.label} clicked`)}
                         className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 transition-colors"
                       >
                         <div className={`p-3 rounded-lg ${action.color} mb-2`}>
@@ -447,42 +366,45 @@ const LeadManagement = () => {
                   </div>
                 </CardContent>
               </Card>
-              {/* Lead Score & Engagement */}
+
+              {/* Engagement Score & Stats */}
               <Card>
                 <CardContent className="p-6">
                   <h3 className="text-lg font-semibold text-gray-900 my-4">
-                    Lead Score
+                    Engagement Score
                   </h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-500">
-                        Engagement Score
+                        Response Rate
                       </span>
                       <span className="text-lg font-semibold text-indigo-600">
-                        {currentLead.engagementScore}/100
+                        {currentEngagement.engagementScore}/100
                       </span>
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-2">
                       <div
                         className="bg-indigo-600 h-2 rounded-full"
-                        style={{ width: `${currentLead.engagementScore}%` }}
+                        style={{
+                          width: `${currentEngagement.engagementScore}%`,
+                        }}
                       ></div>
                     </div>
                     <div className="grid grid-cols-2 gap-4 mt-4">
                       <div className="p-3 bg-gray-50 rounded-lg">
                         <div className="text-sm text-gray-500">
-                          Response Rate
+                          Total Messages
                         </div>
                         <div className="text-lg font-semibold text-gray-900">
-                          {currentLead.responseRate}
+                          {currentEngagement.totalMessages}
                         </div>
                       </div>
                       <div className="p-3 bg-gray-50 rounded-lg">
                         <div className="text-sm text-gray-500">
-                          Last Contact
+                          Total Replies
                         </div>
                         <div className="text-lg font-semibold text-gray-900">
-                          {currentLead.lastContact}
+                          {currentEngagement.replies}
                         </div>
                       </div>
                     </div>
@@ -490,42 +412,72 @@ const LeadManagement = () => {
                 </CardContent>
               </Card>
             </div>
+
             {/* Recent Activity */}
-            <Card className="mb-6">
-              <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 my-4">
-                  Recent Activity
-                </h3>
-                <div className="space-y-4">
-                  {recentActivity.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-start space-x-4 p-4 hover:bg-gray-50 rounded-lg"
-                    >
-                      <div className="p-2 bg-gray-50 rounded-lg">
-                        <Clock className="w-5 h-5 text-gray-400" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="mb-6">
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 my-4">
+                    Recent Activity
+                  </h3>
+                  <div className="space-y-4">
+                    {recentActivity.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-start space-x-4 p-4 hover:bg-gray-50 rounded-lg"
+                      >
+                        <div className="p-2 bg-gray-50 rounded-lg">
+                          <Clock className="w-5 h-5 text-gray-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            {item.title}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {item.description}
+                          </p>
+                          <span className="text-xs text-gray-400">
+                            {item.time}
+                          </span>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {item.title}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {item.description}
-                        </p>
-                        <span className="text-xs text-gray-400">
-                          {item.time}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+              {/*Replies for engagement*/}
+              {loading ? (
+                <div className="flex items-center justify-center p-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
                 </div>
-              </CardContent>
-            </Card>
+              ) : historyError ? (
+                <Alert
+                  variant="error"
+                  description={historyError}
+                  className="mt-4"
+                />
+              ) : (
+                <MessageTracker messages={messages} />
+              )}
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Modals */}
+      {activeModal.isOpen && (
+        <>
+          {activeModal.type === "message" && (
+            <CommonPopUp
+              isOpen={activeModal.isOpen}
+              onClose={() => setActiveModal({ isOpen: false, type: "" })}
+              engagementId={slug}
+            />
+          )}
+        </>
       )}
     </>
   );
 };
 
-export default LeadManagement;
+export default EngagementDetails;

@@ -2,7 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
  images: {
-    domains: ["via.assets.so"],
+    remotePatterns: [
+      {
+        hostname: "via.assets.so"
+      },
+      {
+        hostname: "res.cloudinary.com"
+      }
+    ],
   },
 };
 

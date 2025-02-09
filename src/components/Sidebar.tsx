@@ -21,6 +21,7 @@ const Sidebar: React.FC = () => {
     { label: "Campaigns", icon: <Settings size={20} /> },
     { label: "Follow Ups", icon: <UsersIcon size={20} /> },
     { label: "Chat Bot", icon: <Bot size={20} /> },
+    { label: "Settings", icon: <Settings size={20} /> },
   ];
 
   return (
