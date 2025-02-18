@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/label";
 import { Alert } from "@/components/ui/alert";
-import axios from "@/lib";
+import useAxios from "@/lib";
 import { AxiosError } from "axios";
 
 interface WhatsAppPopupProps {
@@ -43,6 +43,7 @@ const WhatsAppPopup = ({ isOpen, onClose, clientId }: WhatsAppPopupProps) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const axios = useAxios();
 
   const [formData, setFormData] = useState<FormData>({
     message: "",

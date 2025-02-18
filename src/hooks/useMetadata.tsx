@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import axios from '@/lib';
+import useAxios from '@/lib';
 import { toast } from 'react-hot-toast';
 
 export const useMetadata = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [statuses, setStatuses] = useState<string[]>([]);
   const [messageCount, setMessageCount] = useState<number>(0);
+  const axios = useAxios();
 
   useEffect(() => {
     const fetchMetadata = async () => {
@@ -25,7 +26,7 @@ export const useMetadata = () => {
     };
 
     fetchMetadata();
-  }, []);
+  }, [axios]);
 
   return { categories, statuses, messageCount };
 };

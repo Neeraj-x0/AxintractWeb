@@ -19,7 +19,7 @@ import { Label } from "@/components/label";
 import { Alert } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 
-import axios from "@/lib";
+import useAxios from "@/lib";
 import { AxiosError } from "axios";
 
 interface Props {
@@ -33,6 +33,7 @@ interface Props {
 type MessageType = "text" | "image" | "video" | "audio" | "document";
 
 const EngagementPopup = ({ isOpen, onClose, engagementId }: Props) => {
+  const axios = useAxios();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);

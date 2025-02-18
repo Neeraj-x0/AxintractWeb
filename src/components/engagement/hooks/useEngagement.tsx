@@ -1,8 +1,9 @@
 import { useState, useCallback, useEffect } from "react";
-import axios from "@/lib";
+import useAxios from "@/lib";
 import { IEngagement } from "@/types";
 
 export const useEngagement = (slug: string | undefined) => {
+  const axios = useAxios();
   const [engagement, setEngagement] = useState<IEngagement>({
     _id: "",
     name: "",
@@ -30,7 +31,7 @@ export const useEngagement = (slug: string | undefined) => {
       setError("Failed to fetch replies");
       console.error("Error fetching replies:", error);
     }
-  }, [slug]);
+  }, [slug,axios]);
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -41,7 +42,7 @@ export const useEngagement = (slug: string | undefined) => {
       setError("Failed to fetch settings");
       console.error("Settings fetch error:", error);
     }
-  }, []);
+  }, [axios]);
 
   const fetchEngagement = useCallback(async () => {
     if (!slug) return;
@@ -61,7 +62,7 @@ export const useEngagement = (slug: string | undefined) => {
     } finally {
       setIsLoading(false);
     }
-  }, [slug]);
+  }, [slug,axios]);
 
   const handleCategoryChange = useCallback(
     async (newCategory: string) => {
@@ -80,7 +81,7 @@ export const useEngagement = (slug: string | undefined) => {
         setActionLoading(false);
       }
     },
-    [slug]
+    [slug,axios]
   );
 
   const handleDeleteEngagement = useCallback(async () => {
@@ -101,7 +102,7 @@ export const useEngagement = (slug: string | undefined) => {
     } finally {
       setActionLoading(false);
     }
-  }, [slug]);
+  }, [slug,axios]);
 
   useEffect(() => {
     if (slug) {

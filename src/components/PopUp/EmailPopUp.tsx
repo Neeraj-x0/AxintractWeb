@@ -24,7 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import axios from "@/lib";
+import useAxios from "@/lib";
 import { AxiosError } from "axios";
 
 interface EmailPopupProps {
@@ -41,6 +41,7 @@ const EmailPopup = ({
   clientId,
   defaultSubject = "",
 }: EmailPopupProps) => {
+  const axios = useAxios();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);

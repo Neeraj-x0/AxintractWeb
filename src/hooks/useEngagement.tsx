@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react';
 import { IEngagement } from '@/types';
-import axios from '@/lib';
+import useAxios from '@/lib';
 import { toast } from 'react-hot-toast';
 
 export const useEngagements = () => {
+  const axios = useAxios();
   const [loading, setLoading] = useState(false);
   const [engagements, setEngagements] = useState<IEngagement[]>([]);
 
@@ -17,7 +18,7 @@ export const useEngagements = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [axios]);
 
   const handleAddEngagement = useCallback(async (data: Partial<IEngagement>) => {
     try {
@@ -32,7 +33,7 @@ export const useEngagements = () => {
     } finally {
       setLoading(false);
     }
-  }, [fetchEngagements]);
+  }, [fetchEngagements,axios]);
 
   const handleBulkAction = useCallback(async (
     action: "status" | "category" | "delete",
@@ -54,7 +55,7 @@ export const useEngagements = () => {
     } finally {
       setLoading(false);
     }
-  }, [fetchEngagements]);
+  }, [fetchEngagements,axios]);
 
   return {
     engagements,

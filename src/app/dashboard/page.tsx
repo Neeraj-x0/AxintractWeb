@@ -1,4 +1,4 @@
-/* eslint-disable react/display-name */
+"use client";
 import React, { useMemo, useCallback, memo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
@@ -373,5 +373,9 @@ const ProfessionalDashboard = () => {
     </div>
   );
 };
+
+QuickActionButton.displayName = "QuickActionButton";
+StatCard.displayName = "StatCard";
+TaskItem.displayName = "TaskItem";
 
 export default ProfessionalDashboard;

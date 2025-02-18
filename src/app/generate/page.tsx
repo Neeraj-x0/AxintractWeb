@@ -1,13 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import axios from "@/lib";
-import { FiUpload, FiSend, FiImage, FiDownload } from "react-icons/fi";
+import useAxios from "@/lib";
+import {FiSend, FiImage, FiDownload } from "react-icons/fi";
 import Image from "next/image";
 import "./style.css";
 import { AxiosError } from "axios";
 
 const AnimatedPosterGenerator: React.FC = () => {
+  const axios = useAxios();
   // State management
   const [title, setTitle] = useState(
     "Celebrate the Festival of Lights with Axintract"

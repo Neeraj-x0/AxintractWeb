@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/label";
 import { Alert } from "@/components/ui/alert";
-import axios from "@/lib";
+import useAxios from "@/lib";
 import { AxiosError } from "axios";
 
 interface WhatsAppPopupProps {
@@ -43,6 +43,7 @@ const WhatsAppPopup = ({
   onClose,
   engagementId,
 }: WhatsAppPopupProps) => {
+  const axios = useAxios();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);

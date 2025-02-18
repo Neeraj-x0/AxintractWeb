@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "@/lib";
+import useAxios from "@/lib";
 
 interface UseMessageHistoryProps {
   engagementId?: string;
@@ -10,6 +10,7 @@ export const useMessageHistory = ({
   engagementId,
   refreshInterval = 30000,
 }: UseMessageHistoryProps) => {
+  const axios = useAxios();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

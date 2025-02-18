@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import Image from "next/image";
-import axiosInstance from "@/lib";
+import useAxios from "@/lib";
 import { BusinessProfile } from "@/types";
 interface HeaderProps {
   className?: string;
@@ -15,11 +15,13 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
     phoneNumber: "",
   });
 
+  const axiosInstance = useAxios();
+
   useEffect(() => {
     axiosInstance.get("/api/settings").then((res) => {
       setBusinessProfile(res.data.businessProfile);
     });
-  }, []);
+  }, [axiosInstance]);
   return (
     <div
       className={`h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 ${className}`}

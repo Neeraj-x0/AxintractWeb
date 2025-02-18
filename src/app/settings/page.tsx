@@ -1,24 +1,24 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import axios from "@/lib";
+import usAxios from "@/lib";
 import { BusinessProfile } from "@/types";
 
 // Dummy types and functions
-type ExportFormat = "csv" | "xlsx";
 type NotificationType = "error" | "success";
 
 const SettingsPage = () => {
+const axios = usAxios();
   // Basic Settings state
   const [categories, setCategories] = useState<string[]>([]);
   const [statuses, setStatuses] = useState<string[]>([]);
   const [newCategory, setNewCategory] = useState("");
   const [newStatus, setNewStatus] = useState("");
-  const [exportFormat, setExportFormat] = useState<ExportFormat>("csv");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -73,7 +73,7 @@ const SettingsPage = () => {
       }
     };
     fetchSettings();
-  }, [showNotification]);
+  }, [showNotification,axios]);
 
   // Handlers for editing using useCallback
   const handleEdit = useCallback(
@@ -118,7 +118,7 @@ const SettingsPage = () => {
       setEditMode({ type: null, id: null, value: "" });
       showNotification("success", `${type} updated successfully`);
     },
-    [editMode, categories, statuses, showNotification]
+    [editMode, categories, statuses, showNotification,axios]
   );
 
   const handleDelete = useCallback(
@@ -144,7 +144,7 @@ const SettingsPage = () => {
       }
       showNotification("error", `${type} deleted successfully`);
     },
-    [categories, showNotification, statuses]
+    [categories, showNotification, statuses,axios]
   );
 
   const cancelEdit = useCallback(() => {
@@ -168,7 +168,7 @@ const SettingsPage = () => {
     setNewCategory("");
 
     showNotification("success", "Category added successfully");
-  }, [newCategory, showNotification]);
+  }, [newCategory, showNotification,axios]);
 
   const addStatus = useCallback(async () => {
     if (!newStatus.trim()) return;
@@ -181,7 +181,7 @@ const SettingsPage = () => {
     }
     setStatuses((prev) => [...prev, newStatus]);
     setNewStatus("");
-  }, [newStatus, showNotification]);
+  }, [newStatus, showNotification,axios]);
 
   return (
     <div className="min-h-screen  bg-gray-50 p-8 fadeIn">

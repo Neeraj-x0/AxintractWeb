@@ -7,8 +7,7 @@ import { usePathname } from "next/navigation";
 import AddLeadsPopup, {
   AddLeadsPopupProps,
 } from "@/components/PopUp/addLeadPopup";
-import { API_URL, JWT_TOKEN } from "@/constants";
-import axios from "@/lib";
+import useAxios from "@/lib";
 
 interface Lead {
   notes: string;
@@ -22,6 +21,7 @@ interface Lead {
 }
 
 const LeadsDashboard = () => {
+  const axios = useAxios();
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -52,9 +52,8 @@ const LeadsDashboard = () => {
         console.error("Error fetching options:", error);
       }
     };
-
     fetchOptions();
-  }, []);
+  }, [axios]);
   const progressionStages = [
     {
       title: "New",
@@ -100,16 +99,10 @@ const LeadsDashboard = () => {
     try {
       setLoading(true);
       console.log(selectedLeads);
-      const response = await axios.put(
-        `${API_URL}/api/lead/bulk-update`,
-        {
-          id: selectedLeads,
-          status: newStatus,
-        },
-        {
-          headers: { Authorization: `Bearer ${JWT_TOKEN}` },
-        }
-      );
+      const response = await axios.put(`/api/lead/bulk-update`, {
+        id: selectedLeads,
+        status: newStatus,
+      });
 
       if (response.status === 200) {
         await fetchLeads();
@@ -132,16 +125,10 @@ const LeadsDashboard = () => {
 
     try {
       setLoading(true);
-      const response = await axios.put(
-        `${API_URL}/api/lead/bulk-update`,
-        {
-          id: selectedLeads,
-          category: newCategory,
-        },
-        {
-          headers: { Authorization: `Bearer ${JWT_TOKEN}` },
-        }
-      );
+      const response = await axios.put(`/api/lead/bulk-update`, {
+        id: selectedLeads,
+        category: newCategory,
+      });
 
       if (response.status === 200) {
         await fetchLeads();
@@ -170,9 +157,8 @@ const LeadsDashboard = () => {
 
     try {
       setLoading(true);
-      const response = await axios.delete(`${API_URL}/api/lead/bulk-delete`, {
+      const response = await axios.delete(`/api/lead/bulk-delete`, {
         data: { id: selectedLeads },
-        headers: { Authorization: `Bearer ${JWT_TOKEN}` },
       });
 
       if (response.status === 200) {
@@ -197,11 +183,7 @@ const LeadsDashboard = () => {
     try {
       setLoading(true);
       if (formData.type === "manual") {
-        const response = await axios.post(`${API_URL}/api/lead`, formData, {
-          headers: {
-            Authorization: `Bearer ${JWT_TOKEN}`,
-          },
-        });
+        const response = await axios.post(`/api/lead`, formData, {});
 
         if (response.status === 200) {
           await fetchLeads();
@@ -219,11 +201,10 @@ const LeadsDashboard = () => {
         }
 
         const response = await axios.post(
-          `${API_URL}/api/lead/bulk-import`,
+          `/api/lead/bulk-import`,
           formDataWithFile,
           {
             headers: {
-              Authorization: `Bearer ${JWT_TOKEN}`,
               "Content-Type": "multipart/form-data",
             },
           }
@@ -246,11 +227,8 @@ const LeadsDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${API_URL}/api/lead`, {
+      const response = await axios.get(`/api/lead`, {
         params: { page, limit: leadsPerPage },
-        headers: {
-          Authorization: `Bearer ${JWT_TOKEN}`,
-        },
       });
 
       if (response.status === 304) {
@@ -269,7 +247,7 @@ const LeadsDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [page]);
+  }, [page, axios]);
 
   const applyFilters = useCallback(() => {
     // Start fresh with the complete dataset

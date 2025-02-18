@@ -21,13 +21,14 @@ import {
 } from "lucide-react";
 import Header from "@/components/Header";
 import { useParams } from "next/navigation";
-import { API_URL, JWT_TOKEN } from "@/constants";
-import axios from "axios";
+import useAxios from "@/lib";
 import NotFoundPage from "@/components/404";
+import Axios from "axios";
 import EmailPopup from "@/components/PopUp/EmailPopUp";
 import WhatsAppPopup from "@/components/PopUp/WhatsAppPopup";
 
 const LeadManagement = () => {
+  const axios = useAxios();
   const [lead, setLead] = useState({
     id: "",
     name: "",
@@ -161,9 +162,7 @@ const LeadManagement = () => {
 
   const fetchSettings = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/settings`, {
-        headers: { Authorization: `Bearer ${JWT_TOKEN}` },
-      });
+      const response = await axios.get(`/api/settings`);
       const { categories, statuses } = response.data;
       console.log("Settings fetched:", categories, statuses);
 
@@ -177,15 +176,13 @@ const LeadManagement = () => {
 
   const fetchLead = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/lead/${slug}`, {
-        headers: { Authorization: `Bearer ${JWT_TOKEN}` },
-      });
+      const response = await axios.get(`/api/lead/${slug}`);
       if (response.request.status === 400) {
         console.error("Lead not found");
       }
       setLead(response.data);
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
+      if (Axios.isAxiosError(error) && error.response) {
         console.error("Error fetching lead:", error.response.data);
         if (error.response.status === 400) {
           setIsNotFound(true);
@@ -213,9 +210,9 @@ const LeadManagement = () => {
     try {
       setActionLoading(true);
       const response = await axios.put(
-        `${API_URL}/api/lead/${lead.id}`,
+        `/api/lead/${lead.id}`,
         { status: newStatus },
-        { headers: { Authorization: `Bearer ${JWT_TOKEN}` } }
+        
       );
 
       if (response.status === 200) {
@@ -235,9 +232,9 @@ const LeadManagement = () => {
     try {
       setActionLoading(true);
       const response = await axios.put(
-        `${API_URL}/api/lead/${lead.id}`,
+        `/api/lead/${lead.id}`,
         { category: newCategory },
-        { headers: { Authorization: `Bearer ${JWT_TOKEN}` } }
+        
       );
 
       if (response.status === 200) {
@@ -263,9 +260,7 @@ const LeadManagement = () => {
     }
     try {
       setActionLoading(true);
-      const response = await axios.delete(`${API_URL}/api/lead/${lead.id}`, {
-        headers: { Authorization: `Bearer ${JWT_TOKEN}` },
-      });
+      const response = await axios.delete(`/api/lead/${lead.id}`);
       if (response.status === 200) {
         alert("Lead deleted successfully.");
         window.location.href = "/";

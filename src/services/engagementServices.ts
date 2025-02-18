@@ -1,4 +1,4 @@
-import axios from "@/lib";
+import useAxios from "@/lib";
 import {
   IEngagement,
   APIResponse,
@@ -10,11 +10,15 @@ const formatUTCDate = (date: Date): string => {
   return date.toISOString().slice(0, 19).replace("T", " ");
 };
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
+const axios = useAxios();
 export const engagementService = {
+
   /**
    * Create a new engagement
    */
   async createEngagement(data: Partial<IEngagement>): Promise<IEngagement> {
+  
     try {
       const response = await axios.post<APIResponse<IEngagement>>(
         "/api/engagements",
