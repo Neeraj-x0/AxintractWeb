@@ -12,6 +12,7 @@ export interface Lead {
   status: string;
   lastActive: string;
   note: string;
+  source: string;
 }
 
 export interface Communication {
