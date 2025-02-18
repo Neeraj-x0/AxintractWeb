@@ -20,6 +20,7 @@ export const useMessageHistory = ({
         `/api/engagements/${engagementId}/messages`
       );
       setMessages(response.data.data);
+
       setError("");
     } catch {
       setError("Failed to fetch messages");

@@ -18,10 +18,12 @@ const Sidebar: React.FC = () => {
     { label: "Dashboard", icon: <FaHouse /> },
     { label: "Leads", icon: <AiOutlineUser /> },
     { label: "Reminders", icon: <Calendar size={20} /> },
-    { label: "Campaigns", icon: <Settings size={20} /> },
+    {label:"Engagements",icon:<UsersIcon size={20}/>},
+//    { label: "Campaigns", icon: <Settings size={20} /> },
     { label: "Follow Ups", icon: <UsersIcon size={20} /> },
     { label: "Chat Bot", icon: <Bot size={20} /> },
     { label: "Settings", icon: <Settings size={20} /> },
+
   ];
 
   return (

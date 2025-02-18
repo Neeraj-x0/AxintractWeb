@@ -10,6 +10,7 @@ import CampaignDashboard from "@/app/campaigns/page";
 import FollowUpCampaign from "@/app/followup/page";
 import ChatbotAnalytics from "@/app/chatbot";
 import Settings from "@/app/settings/page";
+import Engagements from "@/app/engagements/page";
 const Dashboard: React.FC = () => {
   const activeItem = useSelector((state: RootState) => state.sidebar.activeItem);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -36,6 +37,7 @@ const Dashboard: React.FC = () => {
           {activeItem === "Follow Ups" && <FollowUpCampaign />}
           {activeItem === "Chat Bot" && <ChatbotAnalytics />}
           {activeItem === "Settings" && <Settings />}
+          {activeItem === "Engagements" && <Engagements />}
         </div>
       </div>
     </main>

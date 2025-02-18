@@ -66,7 +66,7 @@ export interface BusinessProfile {
 
 // Base Engagement interface
 export interface IEngagement {
-  _id?: Types.ObjectId;
+  _id?: string | Types.ObjectId;
   name: string;
   notes?: string;
   lastMessage?: Date;
@@ -77,6 +77,7 @@ export interface IEngagement {
   timestamp?: Date;
   totalMessages: number;
   replies: number;
+  reply ?: [];
 }
 
 // For Mongoose Document

@@ -26,6 +26,7 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   engagementId?: string;
+  type?: string;
   defaultSubject?: string;
 }
 
@@ -61,40 +62,50 @@ const EngagementPopup = ({ isOpen, onClose, engagementId }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log(channels);
     e.preventDefault();
     setIsLoading(true);
     setError("");
     setSuccess(false);
 
     try {
-      const data = new FormData();
-      const payload: {
-        channels: ("whatsapp" | "email")[];
-        message?: string;
-        type?: MessageType;
-        mediaType?: MessageType;
-        mediaOptions?: {
-          caption?: string;
-          fileName?: string;
-          mimetype?: string;
-        };
-        emailSubject?: string;
-        emailTemplate?: string;
-        emailBodyType?: "text" | "html";
-        emailData?: { title: string; note: string };
-        customHTML?: string;
-        templateId?: string;
-      } = { channels };
+      // Use FormData if a file is provided; otherwise, build a simple JSON payload.
+      let payload:
+        | FormData
+        | {
+            channels: ("whatsapp" | "email")[];
+            message?: string;
+            mediaType?: MessageType;
+            mediaOptions?: {
+              caption?: string;
+              fileName?: string;
+              mimetype?: string;
+            };
+            emailSubject?: string;
+            emailTemplate?: string;
+            emailBodyType?: "text" | "html";
+            emailData?: { title: string; note: string };
+            customHTML?: string;
+            templateId?: string;
+          };
 
-      payload.channels = channels;
+      // Always include channels list.
+      const channelsStr = channels.join(",");
+
       if (formData.file) {
+        const data = new FormData();
         data.append("file", formData.file);
         data.append("fileName", formData.file.name);
         data.append("mime", formData.file.type);
-        data.append("channels", channels.join(","));
+        data.append("channels", channelsStr);
         data.append("mediaType", formData.mediaType);
         data.append("type", formData.type);
+
+        // Append caption if the media is not audio.
+        if (formData.mediaType !== "audio") {
+          data.append("caption", formData.caption || "");
+        }
+
+        // Include email details if email channel is selected.
         if (channels.includes("email")) {
           data.append("emailSubject", formData.emailSubject);
           data.append("emailTemplate", formData.emailTemplate);
@@ -104,41 +115,49 @@ const EngagementPopup = ({ isOpen, onClose, engagementId }: Props) => {
           data.append("templateId", formData.templateId);
         }
 
-        if (formData.mediaType !== "audio") {
-          data.append("caption", formData.caption || "");
-        }
-      }
-
-      if (channels.includes("whatsapp")) {
-        if (formData.mediaType === "text") {
-          payload.message = formData.message;
-        } else if (formData.file) {
-          payload.mediaOptions = {
-            caption: formData.caption,
-            fileName: formData.file.name,
-            mimetype: formData.file.type,
+        payload = data;
+      } else {
+        const jsonPayload: {
+          channels: ("whatsapp" | "email")[];
+          message?: string;
+          mediaType?: MessageType;
+          mediaOptions?: {
+            caption?: string;
+            fileName?: string;
+            mimetype?: string;
           };
+          emailSubject?: string;
+          emailTemplate?: string;
+          emailBodyType?: "text" | "html";
+          emailData?: { title: string; note: string };
+          customHTML?: string;
+          type?:"mailgun" | "gmail";
+          templateId?: string;
+        } = { channels };
+
+        // For WhatsApp: if message type is text, include the message.
+        if (channels.includes("whatsapp") && formData.mediaType === "text") {
+          jsonPayload.mediaType = formData.mediaType;
+          jsonPayload.message = formData.message;
         }
+
+        // For email: include all relevant email fields.
+        if (channels.includes("email")) {
+          jsonPayload.emailSubject = formData.emailSubject;
+          jsonPayload.emailTemplate = formData.emailTemplate;
+          jsonPayload.emailBodyType = formData.emailBodyType;
+          jsonPayload.emailData = formData.emailData;
+          jsonPayload.customHTML = formData.customHTML;
+          jsonPayload.templateId = formData.templateId;
+          jsonPayload.type = formData.type;
+        }
+
+        payload = jsonPayload;
       }
 
-      if (channels.includes("email")) {
-        payload.emailSubject = formData.emailSubject;
-        payload.emailTemplate = formData.emailTemplate;
-        payload.emailBodyType = formData.emailBodyType;
-        payload.emailData = formData.emailData;
-        payload.customHTML = formData.customHTML;
-        payload.templateId = formData.templateId;
-      }
-
-      await axios.post(
-        `/api/engagements/${engagementId}/send`,
-        formData.file ? data : payload,
-        {
-          headers: {
-            ...(formData.file && { "Content-Type": "multipart/form-data" }),
-          },
-        }
-      );
+      await axios.post(`/api/engagements/${engagementId}/send`, payload, {
+        headers: formData.file ? { "Content-Type": "multipart/form-data" } : {},
+      });
 
       setSuccess(true);
     } catch (err) {
@@ -299,6 +318,7 @@ const EngagementPopup = ({ isOpen, onClose, engagementId }: Props) => {
                   setFormData((prev) => ({
                     ...prev,
                     emailSubject: e.target.value,
+                    
                   }))
                 }
                 placeholder="Email subject"

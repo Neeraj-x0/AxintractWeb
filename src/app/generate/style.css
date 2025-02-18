@@ -1,0 +1,151 @@
+:root {
+  --background: #F1F1F1;
+  --foreground: #202020;
+  --accent-primary: #4F46E5;  /* indigo-600 */
+  --accent-secondary: #E0E7FF; /* indigo-100 */
+  --call-to-action: #4F46E5;  /* indigo-600 */
+  --muted: #7E909A;
+  --highlight: #4F46E5;       /* indigo-600 */
+  --success-bg: #F0FDF4;      /* green-50 */
+  --success-text: #15803D;    /* green-700 */
+  --success-border: #BBF7D0;  /* green-200 */
+}
+
+/* Base Styles */
+.app-container,
+.container {
+  background: var(--background);
+}
+
+h2,
+h3,
+p,
+label {
+  color: var(--foreground);
+}
+
+.btn-generate {
+  background: var(--call-to-action);
+}
+
+.btn-download {
+  background: var(--accent-primary);
+}
+
+.input-field {
+  border: 1px solid var(--muted);
+}
+
+.input-field:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--highlight);
+}
+
+.error-message {
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+  color: #a94442;
+}
+
+.success-alert {
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
+  color: var(--success-text);
+}
+
+.approaching-limit {
+  border-color: var(--highlight);
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);  /* indigo-600 with opacity */
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Section Animations */
+.container {
+  animation: fadeInDown 0.8s ease-out forwards;
+}
+
+.form-section {
+  animation: fadeInUp 0.8s ease-out forwards;
+  animation-delay: 0.2s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.preview-section {
+  animation: fadeIn 1s ease-out forwards;
+  animation-delay: 0.4s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.hover-scale {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.hover-scale:active {
+  transform: scale(0.98);
+}
+
+.generated-preview {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}

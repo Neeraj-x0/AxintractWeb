@@ -42,7 +42,7 @@ const LeadManagement = () => {
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [error, setError] = useState("");
-  
+
   const [isNotFound, setIsNotFound] = useState(false);
 
   // Modal states with type
@@ -410,16 +410,19 @@ const LeadManagement = () => {
               </CardContent>
             </Card>
 
-           
             <EmailPopup
-              isOpen={(activeModal.isOpen && activeModal.type === "email") || false}
+              isOpen={
+                (activeModal.isOpen && activeModal.type === "email") || false
+              }
               onClose={handleModalClose}
-              clientId={slug || ''}
+              clientId={slug || ""}
             />
             <WhatsAppPopup
-              isOpen={(activeModal.isOpen && activeModal.type === "whatsapp") || false}
+              isOpen={
+                (activeModal.isOpen && activeModal.type === "whatsapp") || false
+              }
               onClose={handleModalClose}
-              clientId={slug || ''}
+              clientId={slug || ""}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
