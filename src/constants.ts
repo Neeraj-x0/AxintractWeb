@@ -1,5 +1,5 @@
 "use client";
-const API_URL = process.env.REACT_APP_API_URL || "https://api.axintract,com";
+const API_URL = process.env.REACT_APP_API_URL || "https://api.axintract.com";
 // FETCH TOKEN FROM LOCAL STORAGE WHERE NAME = AUTHTOKEN
 
 export { API_URL };
@@ -22,4 +22,3 @@ export const parseBody = (obj: object): unknown => {
   }
   return hasValidProperties ? cleanedObj : undefined;
 };
-
