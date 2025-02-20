@@ -1,5 +1,5 @@
 "use client";
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
+const API_URL = process.env.REACT_APP_API_URL || "https://api.axintract.com";
 // FETCH TOKEN FROM LOCAL STORAGE WHERE NAME = AUTHTOKEN
 
 export { API_URL };

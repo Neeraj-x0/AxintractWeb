@@ -152,7 +152,6 @@ export const useEngagementForm = ({
         }
 
         payload.append("category", formData.channels.whatsapp && formData.channels.email ? "both" : formData.channels.whatsapp ? "whatsapp" : "email");
-
         const config = {
             headers: {
                 'Content-Type': 'multipart/form-data'
