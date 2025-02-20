@@ -1,5 +1,6 @@
 import React from "react";
 import { Label } from "@/components/label";
+import dayjs from "dayjs";
 import Input from "@/components/ui/input";
 import {
   Select,
@@ -48,10 +49,15 @@ export const ReminderDetails: React.FC<ReminderDetailsProps> = ({
           <Input
             id="scheduledAt"
             type="datetime-local"
-            value={formData.scheduledAt}
+            value={
+              formData.scheduledAt
+                ? dayjs(formData.scheduledAt).format("YYYY-MM-DDTHH:mm")
+                : ""
+            }
             onChange={(e) => {
-              const scheduledAt = new Date(e.target.value).toISOString();
-              onFormChange({ scheduledAt });
+              const localDate = e.target.value; // Gets local datetime
+              console.log("Local Selected:", localDate);
+              onFormChange({ scheduledAt: localDate }); // Store as local time
             }}
             min={currentDate}
             required
