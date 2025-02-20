@@ -59,7 +59,6 @@ const validateFormData = (formData: FormDataState): string | null => {
     if (!formData.scheduledAt) return "Scheduled At is required";
     console.log(formData.generatePoster);
     if (formData.generatePoster && !formData.poster.icon) return "Icon is required";
-
     if (formData.channels.whatsapp &&
         !formData.attachmentFile &&
         !formData.generatePoster &&

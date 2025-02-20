@@ -48,8 +48,14 @@ export const ReminderDetails: React.FC<ReminderDetailsProps> = ({
           <Input
             id="scheduledAt"
             type="datetime-local"
-            value={formData.scheduledAt}
-            onChange={(e) => onFormChange({ scheduledAt: e.target.value })}
+            value={
+              formData.scheduledAt ? formData.scheduledAt.slice(0, 16) : ""
+            } // Trim to "YYYY-MM-DDTHH:mm"
+            onChange={(e) => {
+              const localDate = e.target.value; // Local date-time in "YYYY-MM-DDTHH:mm"
+              const utcDate = new Date(localDate).toISOString(); // Convert to UTC
+              onFormChange({ scheduledAt: utcDate });
+            }}
             min={currentDate}
             required
             className="w-full"
