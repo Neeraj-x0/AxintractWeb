@@ -1,7 +1,7 @@
 import React from "react";
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
-import Dashboard from "../components/Dashboard";
+import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
+import Dashboard from "@/components/Dashboard";
 
 const Home: React.FC = () => {
   return (

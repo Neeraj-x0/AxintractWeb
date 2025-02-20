@@ -1,425 +1,313 @@
-import React, { useState, useRef } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import {  useState } from "react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import Input from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/label";
-import { Alert } from "@/components/ui/alert";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Card } from "@/components/ui/card";
+type FormData = import("../hooks/useEngagementForm").ExtendedFormData;
+type FormDataType = FormData;
+import EmailConfig from "./EmailConfig";
+import WhatsAppConfig from "./WhatsAppConfig";
+import PosterGenerator from "./PosterGenerator";
+import { FileUpload } from "./FileUpload";
+import {
+  
+  useEngagementForm,
+} from "../hooks/useEngagementForm";
+import Image from "next/image";
 
-import useAxios from "@/lib";
-import { AxiosError } from "axios";
-
-interface Props {
+interface EngagementPopupProps {
   isOpen: boolean;
   onClose: () => void;
   engagementId?: string;
-  type?: string;
-  defaultSubject?: string;
 }
 
-type MessageType = "text" | "image" | "video" | "audio" | "document";
+type Channel = "whatsapp" | "email";
 
-const EngagementPopup = ({ isOpen, onClose, engagementId }: Props) => {
-  const axios = useAxios();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [formData, setFormData] = useState({
-    // WhatsApp fields
-    message: "",
-    mediaType: "text" as MessageType,
-    caption: "",
-    file: null as File | null,
-
-    // Email fields
-    emailSubject: "",
-    emailTemplate: "",
-    emailBodyType: "text" as "text" | "html",
-    type: "mailgun" as "mailgun" | "gmail",
-    emailData: {
-      title: "",
-      note: "",
-    },
-    customHTML: "",
-    templateId: "",
+const EngagementPopup = ({
+  isOpen,
+  onClose,
+  engagementId,
+}: EngagementPopupProps) => {
+  // Use an object instead of array for better state management
+  const [channelState, setChannelState] = useState<Record<Channel, boolean>>({
+    whatsapp: false,
+    email: false,
   });
-  const [channels, setChannels] = useState<("whatsapp" | "email")[]>([
-    "whatsapp",
-    "email",
-  ]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [hasAttachment, setHasAttachment] = useState(false);
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [showPosterGenerator, setShowPosterGenerator] = useState(false);
+ 
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const { formData, setFormData, isLoading, error, success, handleSubmit } =
+    useEngagementForm({ engagementId,setAttachmentFile });
+
+
+  const selectedChannels: Channel[] = Object.entries(channelState)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    .filter(([_, isSelected]) => isSelected)
+    .map(([channel]) => channel as Channel);
+
+  const handleChannelToggle = (channel: Channel) => {
+    setChannelState((prev) => ({
+      ...prev,
+      [channel]: !prev[channel],
+    }));
+
+  };
+
+  const setGeneratePoster = (checked: boolean) => {
+    setFormData((prev) => ({ ...prev, generatePoster: checked }));
+  };
+
+  const handleAttachmentToggle = (enabled: boolean) => {
+    setHasAttachment(enabled);
+    if (!enabled) {
+      setAttachmentFile(null);
+      setGeneratePoster(false);
+      setFormData((prev) => ({
+        ...prev,
+        attachmentFile: null,
+        posterGenerated: false,
+      }));
+    }
+  };
+
+  const handleFileUpload = (file: File | null) => {
+    setAttachmentFile(file);
+    setFormData((prev: FormDataType) => ({
+      ...prev,
+      attachmentFile: file,
+    }));
+  };
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError("");
-    setSuccess(false);
-
-    try {
-      // Use FormData if a file is provided; otherwise, build a simple JSON payload.
-      let payload:
-        | FormData
-        | {
-            channels: ("whatsapp" | "email")[];
-            message?: string;
-            mediaType?: MessageType;
-            mediaOptions?: {
-              caption?: string;
-              fileName?: string;
-              mimetype?: string;
-            };
-            emailSubject?: string;
-            emailTemplate?: string;
-            emailBodyType?: "text" | "html";
-            emailData?: { title: string; note: string };
-            customHTML?: string;
-            templateId?: string;
-          };
-
-      // Always include channels list.
-      const channelsStr = channels.join(",");
-
-      if (formData.file) {
-        const data = new FormData();
-        data.append("file", formData.file);
-        data.append("fileName", formData.file.name);
-        data.append("mime", formData.file.type);
-        data.append("channels", channelsStr);
-        data.append("mediaType", formData.mediaType);
-        data.append("type", formData.type);
-
-        // Append caption if the media is not audio.
-        if (formData.mediaType !== "audio") {
-          data.append("caption", formData.caption || "");
-        }
-
-        // Include email details if email channel is selected.
-        if (channels.includes("email")) {
-          data.append("emailSubject", formData.emailSubject);
-          data.append("emailTemplate", formData.emailTemplate);
-          data.append("emailBodyType", formData.emailBodyType);
-          data.append("emailData", JSON.stringify(formData.emailData));
-          data.append("customHTML", formData.customHTML);
-          data.append("templateId", formData.templateId);
-        }
-
-        payload = data;
-      } else {
-        const jsonPayload: {
-          channels: ("whatsapp" | "email")[];
-          message?: string;
-          mediaType?: MessageType;
-          mediaOptions?: {
-            caption?: string;
-            fileName?: string;
-            mimetype?: string;
-          };
-          emailSubject?: string;
-          emailTemplate?: string;
-          emailBodyType?: "text" | "html";
-          emailData?: { title: string; note: string };
-          customHTML?: string;
-          type?:"mailgun" | "gmail";
-          templateId?: string;
-        } = { channels };
-
-        // For WhatsApp: if message type is text, include the message.
-        if (channels.includes("whatsapp") && formData.mediaType === "text") {
-          jsonPayload.mediaType = formData.mediaType;
-          jsonPayload.message = formData.message;
-        }
-
-        // For email: include all relevant email fields.
-        if (channels.includes("email")) {
-          jsonPayload.emailSubject = formData.emailSubject;
-          jsonPayload.emailTemplate = formData.emailTemplate;
-          jsonPayload.emailBodyType = formData.emailBodyType;
-          jsonPayload.emailData = formData.emailData;
-          jsonPayload.customHTML = formData.customHTML;
-          jsonPayload.templateId = formData.templateId;
-          jsonPayload.type = formData.type;
-        }
-
-        payload = jsonPayload;
-      }
-
-      await axios.post(`/api/engagements/${engagementId}/send`, payload, {
-        headers: formData.file ? { "Content-Type": "multipart/form-data" } : {},
-      });
-
-      setSuccess(true);
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        setError(err.response?.data?.message || "Failed to send message");
-      } else if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Failed to send message");
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    formData.channels = selectedChannels;
+    handleSubmit(e);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const resetForm = () => {
-    setFormData({
-      message: "",
-      mediaType: "text",
-      caption: "",
-      file: null,
-      emailSubject: "",
-      emailTemplate: "",
-      emailBodyType: "text",
-      type: "mailgun",
-      emailData: { title: "", note: "" },
-      customHTML: "",
-      templateId: "",
-    });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  const toggleChannel = (channel: "whatsapp" | "email") => {
-    setChannels((prev) =>
-      prev.includes(channel)
-        ? prev.filter((c) => c !== channel)
-        : [...prev, channel]
-    );
+  const handlePosterGenerated = (
+    icon: File,
+    background: File,
+    note: string,
+    title: string
+  ) => {
+    setShowPosterGenerator(false);
+    setFormData((prev: FormData) => ({
+      ...prev,
+      poster: {
+        icon,
+        background,
+        note,
+        title,
+      },
+      posterGenerated: true,
+    }));
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] p-6 fadeIn">
-        <DialogHeader>
-          <DialogTitle className="flex justify-between text-xl">
-            <span>Send Message</span>
+      <DialogContent className="max-w-[1000px] w-[90vw] p-0 gap-0">
+        <div className="sticky top-0 z-10 bg-white border-b">
+          <DialogTitle className="p-6 text-xl font-semibold">
+            Send Message
           </DialogTitle>
-        </DialogHeader>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Channel Selection */}
-          <div className="flex gap-4 items-center border-b pb-4">
-            <Label htmlFor="channel">Channels:</Label>
-            <div className="flex gap-4">
-              {[
-                { id: "whatsapp", label: "WhatsApp" },
-                { id: "email", label: "Email" },
-              ].map(({ id, label }) => (
-                <div key={id} className="flex items-center gap-2">
-                  <Checkbox
-                    id={id}
-                    checked={channels.includes(id as "whatsapp" | "email")}
-                    onCheckedChange={() =>
-                      toggleChannel(id as "whatsapp" | "email")
-                    }
+        <form
+          onSubmit={handleFormSubmit}
+          className="overflow-y-auto max-h-[80vh]"
+        >
+          <div className="p-6 space-y-6">
+            {/* Channel Selection */}
+            <Card className="p-6">
+              <h3 className="text-lg font-medium mb-4">Channels</h3>
+              <div className="flex gap-4">
+                <div className="flex gap-2">
+                  <Switch
+                    checked={channelState.whatsapp}
+                    onCheckedChange={() => handleChannelToggle("whatsapp")}
                   />
-                  <label htmlFor={id}>{label}</label>
+                  <span>Whatsapp</span>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* WhatsApp Section */}
-          {channels.includes("whatsapp") && (
-            <div className="space-y-4 animate-slideDown border-b pb-4">
-              <h3 className="font-medium">WhatsApp Message</h3>
-              <Select
-                value={formData.mediaType}
-                onValueChange={(v: MessageType) =>
-                  setFormData((prev) => ({ ...prev, mediaType: v }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Message Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {["text", "image", "video", "audio", "document"].map(
-                    (type) => (
-                      <SelectItem key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </SelectItem>
-                    )
-                  )}
-                </SelectContent>
-              </Select>
-
-              {formData.mediaType !== "text" && (
-                <>
-                  <Input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        file: e.target.files?.[0] || null,
-                      }))
-                    }
-                    accept={
-                      formData.mediaType === "image"
-                        ? "image/*"
-                        : formData.mediaType === "video"
-                        ? "video/*"
-                        : formData.mediaType === "audio"
-                        ? "audio/*"
-                        : undefined
-                    }
+                <div className="flex gap-2">
+                  <Switch
+                    checked={channelState.email}
+                    onCheckedChange={() => handleChannelToggle("email")}
                   />
-                  {formData.mediaType !== "audio" && (
-                    <Input
-                      placeholder="Caption (optional)"
-                      value={formData.caption}
-                      onChange={(e) =>
+                  <span>Email</span>
+                </div>
+              </div>
+            </Card>
+
+            {/* Rest of the component remains the same */}
+            {/* Attachment Configuration */}
+            <Card className="p-6">
+              <h3 className="text-lg font-medium mb-4">Attachment Settings</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Switch
+                      key="attachment-toggle"
+                      checked={hasAttachment}
+                      onCheckedChange={handleAttachmentToggle}
+                    />
+                    <Label htmlFor="attachment-toggle">
+                      Include Attachment
+                    </Label>
+                  </div>
+
+                  {hasAttachment && !formData.generatePoster && (
+                    <div className="flex items-center space-x-3">
+                      <Switch
+                        key="poster-toggle"
+                        checked={formData.generatePoster}
+                        onCheckedChange={(checked) => {
+                          setGeneratePoster(checked);
+                          if (checked) {
+                            setShowPosterGenerator(true);
+                            setAttachmentFile(null);
+                          }
+                        }}
+                      />
+                      <Label htmlFor="poster-toggle">
+                        Generate Custom Poster
+                      </Label>
+                    </div>
+                  )}
+                </div>
+
+                {hasAttachment && !formData.generatePoster && (
+                  <FileUpload
+                    onChange={handleFileUpload}
+                    accept="image/*,video/*,application/pdf"
+                    maxSize={5}
+                    className="w-full"
+                    value={attachmentFile}
+                    helperText="Upload a file (Max 5MB)"
+                  />
+                )}
+
+                {hasAttachment && formData.generatePoster && (
+                  <div className="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="grid grid-cols-2 gap-4 w-full">
+                        {formData.poster && (
+                          <>
+                            {formData.poster.icon && (
+                              <div>
+                                <Label>Icon</Label>
+                                <Image
+                                  src={URL.createObjectURL(
+                                    formData.poster.icon
+                                  )}
+                                  alt="Icon Preview"
+                                  className="w-20 h-20 object-cover rounded"
+                                  width={20}
+                                  height={20}
+                                />
+                              </div>
+                            )}
+                            {formData.poster.background && (
+                              <div>
+                                <Label>Background</Label>
+                                <Image
+                                  src={URL.createObjectURL(
+                                    formData.poster.background
+                                  )}
+                                  alt="Background Preview"
+                                  className="w-20 h-20 object-cover rounded"
+                                  width={20}
+                                  height={20}
+                                />
+                              </div>
+                            )}
+                            <div className="col-span-2">
+                              <Label>Title</Label>
+                              <p className="text-sm text-gray-600">
+                                {formData.poster.title}
+                              </p>
+                            </div>
+                            <div className="col-span-2">
+                              <Label>Note</Label>
+                              <p className="text-sm text-gray-600">
+                                {formData.poster.note}
+                              </p>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Card>
+
+            {/* Message Configuration */}
+            <div className="grid grid-cols-1 gap-6">
+              {selectedChannels.map((channel) => (
+                <Card key={channel} className="p-6">
+                  {channel === "whatsapp" && (
+                    <WhatsAppConfig
+                      formData={{
+                        message: formData.message,
+                        caption: formData.caption,
+                        attachmentFile,
+                        generatePoster: formData.generatePoster,
+                      }}
+                      setFormData={(whatsappData) =>
                         setFormData((prev) => ({
                           ...prev,
-                          caption: e.target.value,
+                          message: whatsappData.message,
+                          caption: whatsappData.caption,
                         }))
                       }
                     />
                   )}
-                </>
-              )}
-              {formData.mediaType === "text" && (
-                <Textarea
-                  value={formData.message}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      message: e.target.value,
-                    }))
-                  }
-                  placeholder="Type your message..."
-                  required={formData.mediaType === "text"}
-                />
-              )}
+
+                  {channel === "email" && (
+                    <EmailConfig
+                      hasAttachment={hasAttachment}
+                      attachmentFile={attachmentFile}
+                      formData={{
+                        emailSubject: formData.emailSubject,
+                        customHTML: formData.customHTML,
+                        emailTitle: formData.emailData.note,
+                        emailNote: formData.emailData.note,
+                        templateId: formData.templateId,
+                      }}
+                      setFormData={(emailData: unknown) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          ...(emailData as Partial<FormData>),
+                        }))
+                      }
+                    />
+                  )}
+                </Card>
+              ))}
             </div>
-          )}
 
-          {/* Email Section */}
-          {channels.includes("email") && (
-            <div className="space-y-4 animate-slideDown">
-              <h3 className="font-medium">Email Message</h3>
-              <Input
-                value={formData.emailSubject}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    emailSubject: e.target.value,
-                    
-                  }))
-                }
-                placeholder="Email subject"
-                required
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <Select
-                  value={formData.emailBodyType}
-                  onValueChange={(v: "text" | "html") =>
-                    setFormData((prev) => ({ ...prev, emailBodyType: v }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Body Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="text">Plain Text</SelectItem>
-                    <SelectItem value="html">HTML</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  value={formData.type}
-                  onValueChange={(v: "mailgun" | "gmail") =>
-                    setFormData((prev) => ({ ...prev, type: v }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Email Service" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="mailgun">Mailgun</SelectItem>
-                    <SelectItem value="gmail">Gmail</SelectItem>
-                  </SelectContent>
-                </Select>
+            {/* Alerts */}
+            {(error || success) && (
+              <div>
+                {error && (
+                  <div className="bg-red-100 text-red-700 p-4 rounded-lg">
+                    {error}
+                  </div>
+                )}
+                {success.success && (
+                  <div className="bg-green-100 text-green-700 p-4 rounded-lg">
+                    {success.message}
+                  </div>
+                )}
               </div>
+            )}
+          </div>
 
-              {formData.emailBodyType === "html" && (
-                <div className="space-y-4 animate-slideDown">
-                  <Input
-                    placeholder="Email Title"
-                    value={formData.emailData.title}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        emailData: { ...prev.emailData, title: e.target.value },
-                      }))
-                    }
-                  />
-                  <Textarea
-                    placeholder="Email Note"
-                    value={formData.emailData.note}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        emailData: { ...prev.emailData, note: e.target.value },
-                      }))
-                    }
-                  />
-                  <Input
-                    placeholder="Template ID (Optional)"
-                    value={formData.templateId}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        templateId: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-              )}
-
-              <Textarea
-                value={formData.customHTML}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    customHTML: e.target.value,
-                  }))
-                }
-                placeholder={`Enter ${
-                  formData.emailBodyType === "html"
-                    ? "HTML template"
-                    : "email content"
-                }...`}
-                required
-              />
-            </div>
-          )}
-
-          {error && <Alert variant="error" description={error} />}
-          {success && (
-            <Alert
-              className="bg-green-50 text-green-700 border-green-200"
-              description="Message sent successfully!"
-            />
-          )}
-
-          <div className="flex justify-end gap-3">
+          {/* Action Buttons - Fixed at the bottom */}
+          <div className="sticky bottom-0 bg-white border-t p-4 flex justify-end gap-3">
             <Button
               type="button"
               variant="outline"
@@ -430,20 +318,44 @@ const EngagementPopup = ({ isOpen, onClose, engagementId }: Props) => {
             </Button>
             <Button
               type="submit"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white"
-              disabled={isLoading || channels.length === 0}
+              className="bg-primary"
+              disabled={isLoading || selectedChannels.length === 0}
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Sending...
+                  <span>Sending...</span>
                 </div>
               ) : (
-                "Send Messages"
+                "Send Message"
               )}
             </Button>
           </div>
         </form>
+
+        {/* Poster Generator Dialog */}
+        {showPosterGenerator && (
+          <Dialog
+            open={showPosterGenerator}
+            onOpenChange={() => {
+              setShowPosterGenerator(false);
+              setGeneratePoster(false);
+            }}
+          >
+            <DialogContent className="sm:max-w-[800px]">
+              <DialogTitle className="p-6 text-xl font-semibold">
+                Add Poster
+              </DialogTitle>
+              <PosterGenerator
+                onPosterGenerated={handlePosterGenerated}
+                onClose={() => {
+                  setShowPosterGenerator(false);
+                  setGeneratePoster(false);
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
       </DialogContent>
     </Dialog>
   );

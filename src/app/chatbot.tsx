@@ -26,11 +26,10 @@ import {
   Smartphone,
   Download,
 } from "lucide-react";
+import { Overlay } from "@/components/overlay";
 
 const ChatbotAnalytics = () => {
   const [timeRange, setTimeRange] = useState("7d");
-
-  // Simulated data
   const interactionData = [
     { day: "Mon", interactions: 2400, success: 2000, fallback: 400 },
     { day: "Tue", interactions: 2800, success: 2300, fallback: 500 },
@@ -78,9 +77,58 @@ const ChatbotAnalytics = () => {
     },
   ];
 
+
+    return (
+      <div className="relative w-full h-full">
+        {/* Content (blurred background) */}
+        <div className="filter blur-sm opacity-50">
+          <ChatbotAnalyticsContent
+            interactionData={interactionData}
+            sentimentData={sentimentData}
+            keyMetrics={keyMetrics}
+            timeRange={timeRange}
+            setTimeRange={setTimeRange}
+          />
+        </div>
+        <Overlay />
+      </div>
+    );
+  }
+
+
+interface ChatbotAnalyticsContentProps {
+  interactionData: {
+    day: string;
+    interactions: number;
+    success: number;
+    fallback: number;
+  }[];
+  sentimentData: {
+    name: string;
+    value: number;
+    color: string;
+  }[];
+  keyMetrics: {
+    label: string;
+    value: string;
+    change: string;
+    icon: React.ElementType;
+    color: string;
+  }[];
+  timeRange: string;
+  setTimeRange: React.Dispatch<React.SetStateAction<string>>;
+}
+
+// Separate the content into its own component
+const ChatbotAnalyticsContent: React.FC<ChatbotAnalyticsContentProps> = ({
+  interactionData,
+  sentimentData,
+  keyMetrics,
+  timeRange,
+  setTimeRange,
+}) => {
   return (
-    <div className="p-6 space-y-6 fadeIn">
-      {/* Header */}
+    <div className="p-6 space-y-6 fadeIn overflow-hidden">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
@@ -96,7 +144,7 @@ const ChatbotAnalytics = () => {
             Export Report
           </Button>
           <select
-            className="px-3 py-1  text-gray-600 outline outline-1 outline-gray-600 rounded-s"
+            className="px-3 py-1 text-gray-600 outline outline-1 outline-gray-600 rounded-s"
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value)}
           >
@@ -155,10 +203,7 @@ const ChatbotAnalytics = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="day" />
                 <YAxis />
-                <Tooltip 
-                    contentStyle={{ color: "#1F2937" }}
-
-                />
+                <Tooltip contentStyle={{ color: "#1F2937" }} />
                 <Line
                   type="monotone"
                   dataKey="interactions"

@@ -71,8 +71,7 @@ const EngagementDetails: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen max-h-screen bg-gray-50">
       <Header className="flex-shrink-0 sticky top-0 z-50 bg-white border-b" />
-
-      <div className="flex-1 overflow-scroll">
+      <div className=" overflow-scroll">
         <main className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
           <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
             {error && (

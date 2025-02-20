@@ -68,7 +68,7 @@ const WhatsAppPopup = ({
         if (!formData.file) {
           throw new Error("Please select a file to upload");
         }
-        console.log(formData.file);
+      
         data.append("file", formData.file);
         data.append("fileName", formData.file.name);
         data.append("mime", formData.file.type);

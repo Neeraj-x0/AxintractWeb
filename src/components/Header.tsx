@@ -32,7 +32,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         }}
         className="text-2xl font-semibold text-gray-900"
       >
-        RazoMiner
+        Axintract
       </button>
       <div className="flex items-center space-x-4">
         <button className="p-2 hover:bg-gray-100 rounded-lg">

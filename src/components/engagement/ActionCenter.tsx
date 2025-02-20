@@ -1,13 +1,13 @@
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   ListChecks,
   FileText,
   Users,
   BarChart,
   Calendar,
-  Download
-} from 'lucide-react';
+  Download,
+} from "lucide-react";
 
 interface Action {
   icon: React.ElementType;
@@ -20,33 +20,33 @@ const ACTIONS: Action[] = [
   {
     icon: ListChecks,
     label: "Update Status",
-    color: "bg-purple-50 text-purple-600"
+    color: "bg-purple-50 text-purple-600",
   },
   {
     icon: FileText,
     label: "Add Notes",
-    color: "bg-blue-50 text-blue-600"
+    color: "bg-blue-50 text-blue-600",
   },
   {
     icon: Users,
     label: "Assign Team",
-    color: "bg-green-50 text-green-600"
+    color: "bg-green-50 text-green-600",
   },
   {
     icon: BarChart,
     label: "View Analytics",
-    color: "bg-yellow-50 text-yellow-600"
+    color: "bg-yellow-50 text-yellow-600",
   },
   {
     icon: Calendar,
     label: "Schedule Follow-up",
-    color: "bg-gray-50 text-gray-600"
+    color: "bg-gray-50 text-gray-600",
   },
   {
     icon: Download,
     label: "Export Data",
-    color: "bg-indigo-50 text-indigo-600"
-  }
+    color: "bg-indigo-50 text-indigo-600",
+  },
 ];
 
 interface ActionButtonProps {
@@ -55,7 +55,7 @@ interface ActionButtonProps {
 
 const ActionButton: React.FC<ActionButtonProps> = React.memo(({ action }) => {
   const { icon: Icon, label, color } = action;
-  
+
   return (
     <button
       className="flex flex-col items-center p-4 rounded-lg hover:bg-gray-50"
@@ -69,27 +69,34 @@ const ActionButton: React.FC<ActionButtonProps> = React.memo(({ action }) => {
   );
 });
 
-ActionButton.displayName = 'ActionButton';
+ActionButton.displayName = "ActionButton";
 
 interface ActionCenterProps {
   className?: string;
 }
 
-export const ActionCenter: React.FC<ActionCenterProps> = React.memo(({ className }) => (
-  <Card className={className}>
-    <CardContent className="p-6">
-      <h3 className="text-lg font-semibold text-gray-900 my-4">
-        Actions & Tasks
-      </h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        {ACTIONS.map((action, index) => (
-          <ActionButton key={index} action={action} />
-        ))}
-      </div>
-    </CardContent>
-  </Card>
-));
+export const ActionCenter: React.FC<ActionCenterProps> = React.memo(
+  ({ className }) => (
+    <Card className={className}>
+      <CardContent className="p-6">
+        <div className="relative">
+          <h3 className="text-lg font-semibold text-gray-900 my-4">
+            Actions & Tasks
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {ACTIONS.map((action, index) => (
+              <ActionButton key={index} action={action} />
+            ))}
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-sm">
+            <span className="text-xl font-bold text-gray-900">Coming Soon</span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+);
 
-ActionCenter.displayName = 'ActionCenter';
+ActionCenter.displayName = "ActionCenter";
 
 export default ActionCenter;

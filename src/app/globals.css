@@ -312,3 +312,66 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
+
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.2s ease-out;
+}
+
+/* File upload custom styles */
+.file-upload-container {
+  border: 2px dashed #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.file-upload-container:hover {
+  border-color: #94a3b8;
+}
+
+.file-upload-container.drag-active {
+  border-color: #4f46e5;
+  background-color: #eef2ff;
+}
+
+/* Toggle button custom styles */
+.toggle-button {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  border-radius: 12px;
+  background-color: #e2e8f0;
+  transition: background-color 0.2s;
+}
+
+.toggle-button[data-state="on"] {
+  background-color: #22c55e;
+}
+
+.toggle-button[data-state="on"] .toggle-thumb {
+  transform: translateX(18px);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: white;
+  transition: transform 0.2s;
+}

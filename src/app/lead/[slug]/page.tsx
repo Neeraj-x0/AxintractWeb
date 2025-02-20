@@ -164,8 +164,6 @@ const LeadManagement = () => {
     try {
       const response = await axios.get(`/api/settings`);
       const { categories, statuses } = response.data;
-      console.log("Settings fetched:", categories, statuses);
-
       setCategories(categories);
       setStatuses(statuses);
     } catch (error) {

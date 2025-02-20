@@ -4,8 +4,6 @@ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
 
 export { API_URL };
 
-
-
 export const parseBody = (obj: object): unknown => {
   if (obj === null || obj === undefined) return undefined;
   if (typeof obj !== "object") return obj === "" ? undefined : obj;

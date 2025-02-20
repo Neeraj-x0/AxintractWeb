@@ -19,6 +19,7 @@ import {
 import ReminderDash from "@/components/ui/ReminderCard";
 
 import { ReminderGrid } from "@/components/ReminderCard";
+import { Overlay } from "@/components/overlay";
 
 const RemindersDashboard = () => {
   const [reminders, setReminders] = useState<Reminder[]>([
@@ -89,6 +90,7 @@ const RemindersDashboard = () => {
 
   return (
     <div className="p-6 space-y-6 fadeIn">
+      <Overlay />
       <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900 flex items-center">

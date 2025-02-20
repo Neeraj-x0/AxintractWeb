@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../app/redux/store";
-import Analytics from "../app/dashboard/page";
+import Analytics from "../app/Dashboard";
 import LeadsManagement from "../app/lead/page";
 import RemindersDashboard from "@/app/reminders/page";
 import CampaignDashboard from "@/app/campaigns/page";
@@ -27,7 +27,7 @@ const Dashboard: React.FC = () => {
       {/* Wrap content in a container that manages overflow */}
       <div 
         ref={contentRef}
-        className="absolute inset-0 overflow-y-auto overflow-x-hidden"
+        className="absolute inset-0 overflow-y-auto"
       >
         <div className="min-h-full w-full">
           {activeItem === "Dashboard" && <Analytics />}
