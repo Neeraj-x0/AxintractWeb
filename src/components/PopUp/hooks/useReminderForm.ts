@@ -103,6 +103,7 @@ export const useEngagementForm = ({
         e.preventDefault();
         if (isLoading) return;
         setError(null);
+        setIsLoading(true);
 
         const payload = new FormData();
         console.log(formData);
@@ -161,6 +162,12 @@ export const useEngagementForm = ({
         axios.post(`/api/reminder/${engagementId}`, payload, config).then((response) => {
             setSuccess(response.data);
             if (onSuccess) onSuccess(response.data);
+            setIsLoading(false);
+
+
+            setFormData(initialFormData);
+            setAttachmentFile?.(null);
+            
         }).catch((err) => {
             setError(err.response?.data?.message || "An error occurred");
             setIsLoading(false);
@@ -169,7 +176,7 @@ export const useEngagementForm = ({
             setIsLoading(false);
         });
         return payload;
-    }, [axios, engagementId, formData, isLoading, onError, onSuccess]);
+    }, [axios, engagementId, formData, initialFormData, isLoading, onError, onSuccess, setAttachmentFile]);
 
 
     return {
