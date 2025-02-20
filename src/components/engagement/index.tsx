@@ -89,10 +89,10 @@ const EngagementDetails: React.FC = () => {
           )}
         </div>
       </div>
-
+      
       <CommonModal
         isOpen={activeModal.isOpen}
-        type={activeModal.type}
+
         engagementId={slug}
         onClose={() => setActiveModal({ isOpen: false, type: "" })}
       />
