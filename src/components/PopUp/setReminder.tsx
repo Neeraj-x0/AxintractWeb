@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ChannelSelector from "./ChannelSelector";
-import { AttachmentSection } from "./Modal/AttachmentSection";
+import { AttachmentSection } from "./Modal/AttachmentSectionR";
 import { MessageConfiguration } from "./Modal/MessageConfiguration";
 import PosterGenerator from "./PosterGenerator";
 import {  useEngagementForm } from "./hooks/useReminderForm";
