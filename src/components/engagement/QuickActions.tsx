@@ -63,7 +63,7 @@ const ActionButton: React.FC<ActionButtonProps> = React.memo(
       <MotionButton
         onClick={onClick}
         className={`group flex flex-col sm:flex-row items-center p-3 sm:p-4 rounded-xl 
-          transition-all duration-200 hover:shadow-md ${hoverColor}
+          transition-all duration-200 hover:shadow-md ${hoverColor} max-w-sm
           w-full border border-gray-100 hover:border-gray-200 bg-white`}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
@@ -89,11 +89,11 @@ const ActionButton: React.FC<ActionButtonProps> = React.memo(
 
 export const QuickActions: React.FC<QuickActionsProps> = React.memo(
   ({ onAction }) => (
-    <div className="w-full">
+    <div className="max-w-3xl ">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
         Quick Actions
       </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-3">
         {QUICK_ACTIONS.map((action, index) => (
           <MotionDiv
             key={index}

@@ -19,7 +19,6 @@ import {
   Delete,
   ChevronDown,
 } from "lucide-react";
-import Header from "@/components/Header";
 import { useParams } from "next/navigation";
 import useAxios from "@/lib";
 import NotFoundPage from "@/components/404";
@@ -298,7 +297,6 @@ const LeadManagement = () => {
         <NotFoundPage />
       ) : (
         <div className="fadeIn">
-          <Header />
           <div className="mx-auto overflow-y-scroll p-6 h-screen mb-12 space-y-6">
             {error && <p className="text-red-600">{error}</p>}
 

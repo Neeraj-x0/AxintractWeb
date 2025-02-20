@@ -2,7 +2,7 @@ import React from "react";
 import { Card } from "@/components/ui/card";
 import WhatsAppConfig from "../WhatsAppConfig";
 import EmailConfig from "../EmailConfig";
-import { ExtendedFormData } from "../../hooks/useEngagementForm";
+import { ExtendedFormData } from "../hooks/useEngagementForm";
 
 interface FormData {
   message?: string;
@@ -71,7 +71,7 @@ export const MessageConfiguration: React.FC<MessageConfigurationProps> = ({
                 }}
                 setFormData={(emailData) => {
                   if (typeof emailData === "object" && emailData !== null) {
-                    setFormData(emailData as Partial<FormData>);
+                    setFormData(emailData as Partial<ExtendedFormData>);
                   }
                 }}
               />

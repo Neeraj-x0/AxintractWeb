@@ -4,7 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/label";
 import { FileUpload } from "../FileUpload";
 import { PosterPreview } from "./PosterPreview";
-import { ExtendedFormData } from "../../hooks/useEngagementForm";
+import { ExtendedFormData } from "../hooks/useEngagementForm";
 import { PosterData } from "./types";
 
 

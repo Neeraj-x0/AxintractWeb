@@ -30,6 +30,7 @@ const Home: React.FC = () => {
         onCollapsedChange={setSidebarCollapsed}
         isSidebarOpen={isSidebarOpen}
         onSidebarOpenChange={setIsSidebarOpen}
+        
       />
 
       {/* Mobile Overlay */}

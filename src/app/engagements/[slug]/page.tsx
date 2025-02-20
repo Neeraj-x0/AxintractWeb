@@ -2,7 +2,6 @@
 import React, { useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
-import Header from "@/components/Header";
 import NotFoundPage from "@/components/404";
 import { Alert } from "@/components/ui/alert";
 import { useEngagement } from "@/components/engagement/hooks/useEngagement";
@@ -20,7 +19,6 @@ import MessageTracker from "@/components/engagement/MessageTracker";
 const EngagementDetails: React.FC = () => {
   const params = useParams();
   const slug = Array.isArray(params?.slug) ? params.slug[0] : params?.slug;
-
   const {
     engagement,
     categories,
@@ -66,13 +64,11 @@ const EngagementDetails: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen max-h-screen bg-gray-50">
-      <Header className="flex-shrink-0 sticky top-0 z-50 bg-white border-b" />
-
+    <div className="flex w-full flex-col min-h-screen max-h-screen bg-gray-50">
       {/* Main Content Area */}
       <div className="flex-1 overflow-auto">
         <main className="h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
+          <div className=" mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
             {/* Error Alert */}
             {error && (
               <Alert

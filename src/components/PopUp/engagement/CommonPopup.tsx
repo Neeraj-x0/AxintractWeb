@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import ChannelSelector from "./ChannelSelector";
-import { AttachmentSection } from "./Modal/AttachmentSection";
-import { MessageConfiguration } from "./Modal/MessageConfiguration";
-import PosterGenerator from "./PosterGenerator";
+import ChannelSelector from "../ChannelSelector";
+import { AttachmentSection } from "../Modal/AttachmentSection";
+import { MessageConfiguration } from "../Modal/MessageConfiguration";
+import PosterGenerator from "../PosterGenerator";
 import {
   ExtendedFormData,
   useEngagementForm,
 } from "../hooks/useEngagementForm";
-import { Channel, EngagementPopupProps } from "./Modal/types";
+import { Channel, EngagementPopupProps } from "../Modal/types";
 import { AlertBanner } from "@/components/ui/AlertBanner";
 
 const EngagementPopup: React.FC<EngagementPopupProps> = ({
