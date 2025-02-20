@@ -58,7 +58,7 @@ const validateFormData = (formData: FormDataState): string | null => {
     if (!formData.frequency) return "Frequency is required";
     if (!formData.scheduledAt) return "Scheduled At is required";
     console.log(formData.generatePoster);
-    if (formData.poster && formData.generatePoster && !formData.poster.icon) return "Icon is required";
+    if (formData.generatePoster && !formData.poster.icon) return "Icon is required";
 
     if (formData.channels.whatsapp &&
         !formData.attachmentFile &&
@@ -205,8 +205,8 @@ export const useEngagementForm = ({
 
             setSuccess(response.data);
             onSuccess?.(response.data);
-            setFormData(initialFormData);
-            setAttachmentFile?.(null);
+            // setFormData(initialFormData);
+            // setAttachmentFile?.(null);
         } catch (err: Error | unknown) {
             const error = err as { response?: { data?: { message?: string } } };
             const errorMessage = error.response?.data?.message || "An error occurred";
@@ -216,7 +216,7 @@ export const useEngagementForm = ({
         } finally {
             setIsLoading(false);
         }
-    }, [axios, engagementId, formData, initialFormData, isLoading, onError, onSuccess, setAttachmentFile]);
+    }, [axios, engagementId, formData, isLoading, onError, onSuccess]);
 
     return {
         formData,
