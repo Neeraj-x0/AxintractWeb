@@ -446,7 +446,7 @@ const SettingsPage: React.FC = () => {
                 {businessProfile.companyLogo ? (
                   <div className="mb-3 relative h-16 w-16">
                     <Image
-                      src={businessProfile.companyLogo}
+                      src={"https://api.axintract.com/media/"+businessProfile.companyLogo}
                       alt="Company Logo"
                       fill
                       sizes="64px"

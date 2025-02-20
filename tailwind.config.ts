@@ -15,6 +15,11 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      zIndex: {
+        '5': '5',
+        '10': '10',
+        '20': '20',
+      },
       keyframes: {
         "fade-in": {
           from: { opacity: "0" },

@@ -33,40 +33,41 @@ export const EngagementHeader: React.FC<EngagementHeaderProps> = React.memo(
     }, []);
 
     return (
-      <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-6">
-            <div className="space-y-1">
-              <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
-                {engagement.name}
-              </h2>
-              <div className="flex items-center space-x-4 text-sm">
-                <div className="flex items-center text-gray-500">
-                  <Tag className="w-4 h-4 mr-2" />
-                  {engagement.category}
-                </div>
-                <div className="flex items-center">
-                  <Clock className="w-4 h-4 mr-2 text-indigo-500" />
-                  <span className="text-indigo-500 font-medium">
-                    {engagement.lastMessage
-                      ? new Date(engagement.lastMessage).toLocaleString()
-                      : "No date"}
-                  </span>
-                </div>
+      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 mb-4 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+          {/* Left side - Title and metadata */}
+          <div className="space-y-3 sm:space-y-1">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 tracking-tight break-words">
+              {engagement.name}
+            </h2>
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 text-sm">
+              <div className="flex items-center text-gray-500">
+                <Tag className="w-4 h-4 mr-2 flex-shrink-0" />
+                <span className="truncate">{engagement.category}</span>
+              </div>
+              <div className="flex items-center">
+                <Clock className="w-4 h-4 mr-2 text-indigo-500 flex-shrink-0" />
+                <span className="text-indigo-500 font-medium truncate">
+                  {engagement.lastMessage
+                    ? new Date(engagement.lastMessage).toLocaleString()
+                    : "No date"}
+                </span>
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-4" ref={dropdownRef}>
-            <div className="relative">
+
+          {/* Right side - Actions */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4" ref={dropdownRef}>
+            <div className="relative w-full sm:w-auto">
               <Button
                 variant="outline"
-                className="border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 transition-all"
+                className="w-full sm:w-auto border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 transition-all text-sm sm:text-base"
                 onClick={() =>
                   setIsCategoryDropdownOpen(!isCategoryDropdownOpen)
                 }
                 disabled={actionLoading}
               >
-                <ArrowUpRight className="w-4 h-4 mr-2" />
+                <ArrowUpRight className="w-4 h-4 mr-2 hidden sm:inline" />
                 Update Category
                 <ChevronDown
                   className={`w-4 h-4 ml-2 transition-transform duration-200 ${
@@ -90,7 +91,7 @@ export const EngagementHeader: React.FC<EngagementHeaderProps> = React.memo(
 
             <Button
               variant="ghost"
-              className="text-red-600 hover:bg-red-50 hover:text-red-700 transition-all"
+              className="w-full sm:w-auto text-red-600 hover:bg-red-50 hover:text-red-700 transition-all text-sm sm:text-base"
               onClick={onDelete}
               disabled={actionLoading}
             >
@@ -117,14 +118,14 @@ const CategoryDropdown: React.FC<{
     initial={{ opacity: 0, y: -10 }}
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: -10 }}
-    className="absolute z-10 right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-100"
+    className="absolute z-10 left-0 sm:right-0 sm:left-auto mt-2 w-full sm:w-56 bg-white rounded-lg shadow-xl border border-gray-100"
   >
-    <div className="py-2">
+    <div className="py-2 max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200">
       {categories.map((category) => (
         <MotionDiv
           key={category}
           onClick={() => onSelect(category)}
-          className={`px-4 py-2 text-sm hover:bg-indigo-50 cursor-pointer flex items-center justify-between
+          className={`px-4 py-2.5 text-sm hover:bg-indigo-50 cursor-pointer flex items-center justify-between
             ${
               category === currentCategory
                 ? "text-indigo-600 bg-indigo-50"
@@ -134,15 +135,16 @@ const CategoryDropdown: React.FC<{
           whileHover={{ x: 4 }}
           transition={{ duration: 0.2 }}
         >
-          {category}
+          <span className="truncate mr-2">{category}</span>
           {category === currentCategory && (
-            <div className="w-2 h-2 rounded-full bg-indigo-600" />
+            <div className="w-2 h-2 rounded-full bg-indigo-600 flex-shrink-0" />
           )}
         </MotionDiv>
       ))}
     </div>
   </MotionDiv>
 ));
+
 
 EngagementHeader.displayName = "EngagementHeader";
 CategoryDropdown.displayName = "CategoryDropdown";

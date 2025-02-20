@@ -12,7 +12,7 @@ import {EngagementHeader} from "@/components/engagement/engagementHeader";
 import QuickActions from  "./QuickActions";
 import ActionCenter from "./ActionCenter";
 import EngagementStats from "./EngagementStats";
-import RecentActivity from "./RecentActivity";
+import RecentActivity from "./ReplyTracker";
 import MessageTracker from "@/components/engagement/MessageTracker";
 import CommonModal from "@/components/PopUp/engagement/CommonPopup";
 

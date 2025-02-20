@@ -13,7 +13,7 @@ export interface ExtendedFormData extends FormData {
         icon?: File
         background?: File;
     };
-    channels: ("whatsapp" | "email")[]; // Ensure channels are always populated
+    channels: { whatsapp: boolean; email: boolean };
     attachmentFile: File | null;
     generatePoster: boolean;
     message: string;
@@ -48,7 +48,7 @@ export const useEngagementForm = ({
     const axios = useAxios();
 
     const initialFormData = Object.assign(new FormData(), {
-        channels: [], // Ensure channels are correctly set
+        channels: { whatsapp: false, email: false },
         attachmentFile: null,
         generatePoster: false,
         message: "",
@@ -70,13 +70,13 @@ export const useEngagementForm = ({
 
     // **Fix: Ensure channels persist**
     const toggleChannel = useCallback((channel: "whatsapp" | "email") => {
-        setFormData((prev) => {
-            const updatedChannels = prev.channels.includes(channel)
-                ? prev.channels.filter((c) => c !== channel)
-                : [...prev.channels, channel];
-
-            return { ...prev, channels: updatedChannels };
-        });
+        setFormData((prev) => ({
+            ...prev,
+            channels: {
+                ...prev.channels,
+                [channel]: !prev.channels[channel]
+            }
+        }));
     }, []);
 
 
@@ -85,13 +85,14 @@ export const useEngagementForm = ({
     // **Fix: Validate form with updated logic**
     const validateForm = useCallback((): boolean => {
         setError(null);
+        const channels = Object.entries(formData.channels).filter(([, enabled]) => enabled).map(([channel]) => channel);
 
-        if (formData.channels.length === 0) {
+        if (channels.length === 0) {
             setError("Please select at least one channel");
             return false;
         }
 
-        if (formData.channels.includes("whatsapp")) {
+        if (channels.includes("whatsapp")) {
             console.log(formData.attachmentFile, formData.generatePoster, formData.message);
             if (!formData.attachmentFile && !formData.generatePoster && !formData.message) {
                 setError("Please enter a WhatsApp message or upload a file/generate a poster");
@@ -99,7 +100,7 @@ export const useEngagementForm = ({
             }
         }
 
-        if (formData.channels.includes("email")) {
+        if (channels.includes("email")) {
             if (!formData.emailSubject) {
                 setError("Please enter an email subject");
                 return false;
@@ -146,16 +147,10 @@ export const useEngagementForm = ({
         try {
             const formPayload = new FormData() as ExtendedFormData;
 
-            // Ensure channels are included in payload if not already assigned.
-            const channels = formData.channels.length
-                ? formData.channels
-                : [
-                    ...(formData.message ? ["whatsapp"] : []),
-                    ...(formData.customHTML ? ["email"] : []),
-                ];
-            formPayload.append("channels", JSON.stringify(channels));
+            const channels = formData.channels;
+            formPayload.append("channels", JSON.stringify(Object.entries(channels).filter(([, enabled]) => enabled).map(([channel]) => channel)));
 
-            if (channels.includes("whatsapp")) {
+            if (channels.whatsapp) {
                 if (formData.attachmentFile) {
                     formPayload.append("file", formData.attachmentFile);
                 } else if (formData.generatePoster) {
@@ -166,7 +161,7 @@ export const useEngagementForm = ({
                 formPayload.append("caption", formData.caption);
             }
 
-            if (channels.includes("email")) {
+            if (channels.email) {
                 if (formData.attachmentFile) {
                     formPayload.append("file", formData.attachmentFile);
                 } else if (formData.generatePoster) {

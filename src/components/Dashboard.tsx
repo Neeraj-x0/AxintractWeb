@@ -1,4 +1,3 @@
-// Dashboard.tsx
 "use client";
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
@@ -11,8 +10,11 @@ import FollowUpCampaign from "@/app/followup/page";
 import ChatbotAnalytics from "@/app/chatbot";
 import Settings from "@/app/settings/page";
 import Engagements from "@/app/engagements/page";
+
 const Dashboard: React.FC = () => {
-  const activeItem = useSelector((state: RootState) => state.sidebar.activeItem);
+  const activeItem = useSelector(
+    (state: RootState) => state.sidebar.activeItem
+  );
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Reset scroll position when switching views
@@ -22,25 +24,39 @@ const Dashboard: React.FC = () => {
     }
   }, [activeItem]);
 
+  // Component map for better organization
+  const components = {
+    Dashboard: Analytics,
+    Leads: LeadsManagement,
+    Reminders: RemindersDashboard,
+    Campaigns: CampaignDashboard,
+    "Follow Ups": FollowUpCampaign,
+    "Chat Bot": ChatbotAnalytics,
+    Settings: Settings,
+    Engagements: Engagements,
+  } as const;
+
+  // Get the current component
+  const CurrentComponent = components[activeItem as keyof typeof components];
+
   return (
-    <main className="relative flex-1 h-full overflow-hidden">
-      {/* Wrap content in a container that manages overflow */}
-      <div 
-        ref={contentRef}
-        className="absolute inset-0 overflow-y-auto"
-      >
-        <div className="min-h-full w-full">
-          {activeItem === "Dashboard" && <Analytics />}
-          {activeItem === "Leads" && <LeadsManagement />}
-          {activeItem === "Reminders" && <RemindersDashboard />}
-          {activeItem === "Campaigns" && <CampaignDashboard />}
-          {activeItem === "Follow Ups" && <FollowUpCampaign />}
-          {activeItem === "Chat Bot" && <ChatbotAnalytics />}
-          {activeItem === "Settings" && <Settings />}
-          {activeItem === "Engagements" && <Engagements />}
+    <div className="relative h-full flex flex-col">
+      <div ref={contentRef} className="flex-1 overflow-y-auto">
+        <div className="">
+          {CurrentComponent ? (
+            <div className="animate-fadeIn">
+              <CurrentComponent />
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500">
+                No content available for {activeItem}
+              </p>
+            </div>
+          )}
         </div>
       </div>
-    </main>
+    </div>
   );
 };
 

@@ -41,7 +41,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
         <div className="flex items-center space-x-2">
           {businessProfile.companyLogo ? (
             <Image
-              src={businessProfile.companyLogo}
+             src={"https://api.axintract.com/media/"+businessProfile.companyLogo}
               alt={businessProfile.companyName}
               width={32}
               height={32}

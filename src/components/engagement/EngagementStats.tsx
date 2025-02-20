@@ -35,7 +35,7 @@ export const EngagementStats: React.FC<EngagementStatsProps> = React.memo(({ eng
   return (
     <Card>
       <CardContent className="p-6">
-        <h3 className="text-lg font-semibold text-gray-900 my-4">
+        <h3 className="text-lg pt-4 font-semibold text-gray-900 my-4">
           Engagement Score
         </h3>
         <div className="space-y-4">

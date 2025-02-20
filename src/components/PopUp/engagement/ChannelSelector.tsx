@@ -6,7 +6,7 @@ import { JSX } from "react";
 type Channel = "whatsapp" | "email";
 
 interface ChannelSelectorProps {
-  selectedChannels: Channel[];
+  selectedChannels: { whatsapp: boolean; email: boolean };
   onChannelToggle: (channel: Channel) => void;
 }
 
@@ -37,7 +37,7 @@ const ChannelSelector = ({
             className={`
               flex items-center justify-between p-4 rounded-lg border transition-all
               ${
-                selectedChannels.includes(id)
+                selectedChannels[id]
                   ? "border-primary bg-primary/5"
                   : "border-gray-200 hover:border-gray-300"
               }
@@ -48,7 +48,7 @@ const ChannelSelector = ({
                 className={`
                   p-2 rounded-md
                   ${
-                    selectedChannels.includes(id)
+                    selectedChannels[id]
                       ? "text-primary bg-primary/10"
                       : "text-gray-500 bg-gray-100"
                   }
@@ -65,7 +65,7 @@ const ChannelSelector = ({
             </div>
             <Switch
               key={id}
-              checked={selectedChannels.includes(id)}
+              checked={selectedChannels[id]}
               onCheckedChange={() => onChannelToggle(id)}
               className="data-[state=checked]:bg-primary"
             />
