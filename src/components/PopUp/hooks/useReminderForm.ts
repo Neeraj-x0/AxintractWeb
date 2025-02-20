@@ -94,29 +94,30 @@ export const useEngagementForm = ({
             attachmentFile: file,
             generatePoster: false, // Disable poster generation if file is uploaded
         }));
-      if (setAttachmentFile) {
-        setAttachmentFile(file);
-      }
+        if (setAttachmentFile) {
+            setAttachmentFile(file);
+        }
     }, [setAttachmentFile]);
 
     const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (isLoading) return;
         setError(null);
-      
+
         const payload = new FormData();
         console.log(formData);
 
-        if (formData.generatePoster) {
+        if (formData.poster) {
             payload.append("poster", JSON.stringify({
                 title: formData.poster.title,
                 note: formData.poster.note,
             }));
             if (!formData.poster.icon) return setError("Icon is required");
-
+            payload.append("icon", formData.poster.icon);
             if (formData.poster.background) {
                 payload.append("background", formData.poster.background);
             }
+
         }
         if (!formData.description) return setError("Description is required");
         payload.append("description", formData.description.toString());
@@ -153,9 +154,9 @@ export const useEngagementForm = ({
         payload.append("category", formData.channels.whatsapp && formData.channels.email ? "both" : formData.channels.whatsapp ? "whatsapp" : "email");
 
         const config = {
-            headers: formData.attachmentFile? {
-            'Content-Type': 'multipart/form-data'
-            } : undefined
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
         };
 
         axios.post(`/api/reminder/${engagementId}`, payload, config).then((response) => {

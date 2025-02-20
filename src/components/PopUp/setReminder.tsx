@@ -5,7 +5,7 @@ import ChannelSelector from "./ChannelSelector";
 import { AttachmentSection } from "./Modal/AttachmentSection";
 import { MessageConfiguration } from "./Modal/MessageConfiguration";
 import PosterGenerator from "./PosterGenerator";
-import { ExtendedFormData, useEngagementForm } from "./hooks/useReminderForm";
+import {  useEngagementForm } from "./hooks/useReminderForm";
 import { Channel, EngagementPopupProps } from "./Modal/types";
 import { AlertBanner } from "@/components/ui/AlertBanner";
 import { ReminderDetails } from "./ReminderDetails";
@@ -67,14 +67,9 @@ const EngagementPopup: React.FC<EngagementPopupProps> = ({
     title: string
   ) => {
     setShowPosterGenerator(false);
-    setFormData((prev: ExtendedFormData) => ({
+    formData.poster = { icon, background, note, title };
+    setFormData((prev) => ({
       ...prev,
-      poster: {
-        icon,
-        background,
-        note,
-        title,
-      },
       posterGenerated: true,
     }));
   };
