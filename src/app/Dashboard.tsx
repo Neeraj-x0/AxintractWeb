@@ -23,8 +23,9 @@ const LeadsEngagerDashboard = () => {
   const [metrics, setMetrics] = useState({
     responseRate: { value: 0, change: "0%" },
     avgResponseTime: { value: 0, change: "0%" },
-    conversionRate: { value: 0, change: "0%" },
+    conversionRate: { value: 0, change: "0%" },  
   });
+
   const axios = useAxios();
 
   useEffect(() => {

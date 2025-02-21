@@ -11,7 +11,7 @@ const TemplateCard = () => {
         <div className="text-center p-3 sm:p-4">
           <FileText size={36} className="text-blue-600 mx-auto mb-3 sm:mb-4" />
           <h3 className="font-semibold text-blue-800 mb-2 text-base sm:text-lg">
-            New to Leads Engager?
+            Axintract
           </h3>
           <p className="text-blue-700 text-xs sm:text-sm mb-3 sm:mb-4">
             Download our sample Excel template to get started quickly.

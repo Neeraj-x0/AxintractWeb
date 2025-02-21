@@ -114,43 +114,56 @@ const EngagementDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="grid grid-cols-3 gap-6 mb-8">
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6">
+      {/* Analytics Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8">
         {analyticsCards.map((card, index) => (
           <AnalyticsCard key={index} {...card} />
         ))}
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <div className="flex justify-between items-center mb-6">
-          <ActionBar
-            selectedIds={selectedIds}
-            categories={categories}
-            statuses={statuses}
-            onBulkAction={handleBulkAction}
-            onAddNew={() => setIsModalOpen(true)}
-          />
+      {/* Main Content Area */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6 mb-6 overflow-x-auto">
+        {/* Action and Filter Bar */}
+        <div className="flex flex-col lg:flex-row gap-4 lg:justify-between lg:items-center mb-4 md:mb-6">
+          <div className="w-full lg:w-auto">
+            <ActionBar
+              selectedIds={selectedIds}
+              categories={categories}
+              statuses={statuses}
+              onBulkAction={handleBulkAction}
+              onAddNew={() => setIsModalOpen(true)}
+            />
+          </div>
 
-          <FilterBar
-            searchQuery={searchQuery}
-            statusFilter={statusFilter}
-            categoryFilter={categoryFilter}
-            categories={categories}
-            statuses={statuses}
-            onSearch={handleSearch}
-            onStatusFilter={handleStatusFilter}
-            onCategoryFilter={handleCategoryFilter}
-          />
+          <div className="w-full lg:w-auto">
+            <FilterBar
+              searchQuery={searchQuery}
+              statusFilter={statusFilter}
+              categoryFilter={categoryFilter}
+              categories={categories}
+              statuses={statuses}
+              onSearch={handleSearch}
+              onStatusFilter={handleStatusFilter}
+              onCategoryFilter={handleCategoryFilter}
+            />
+          </div>
         </div>
 
-        <EngagementTable
-          engagements={filteredEngagements}
-          selectedIds={selectedIds}
-          onSelectAll={handleSelectAll}
-          onSelectOne={handleSelectOne}
-        />
+        {/* Table Container with horizontal scroll for small screens */}
+        <div className="overflow-x-auto -mx-3 sm:-mx-4 md:-mx-6">
+          <div className="inline-block min-w-full align-middle">
+            <EngagementTable
+              engagements={filteredEngagements}
+              selectedIds={selectedIds}
+              onSelectAll={handleSelectAll}
+              onSelectOne={handleSelectOne}
+            />
+          </div>
+        </div>
       </div>
 
+      {/* Modal */}
       <CreateEngagementPopup
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

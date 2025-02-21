@@ -10,7 +10,7 @@ const Header = ({ successPoints }: HeaderProps) => {
     <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-8 sm:py-16 px-4 sm:px-8">
       <div className="mx-auto">
         <h1 className="text-3xl sm:text-4xl font-bold mb-4">
-          Welcome to Leads Engager
+          Welcome to Axintract
         </h1>
         <p className="text-lg sm:text-xl max-w-2xl mb-8 opacity-90">
           Respond faster, convert more leads. Don&apos;t lose to competitors due to

@@ -26,7 +26,7 @@ const Benefits = () => {
   return (
     <div className="mt-8 sm:mt-12 mb-6 sm:mb-8 text-center">
       <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-        Why Choose Leads Engager?
+        Why Choose Axintract?
       </h2>
       <p className="text-gray-600 max-w-3xl mx-auto mb-6 sm:mb-8 text-sm sm:text-base px-4">
         Our platform helps you engage leads faster and more effectively, increasing

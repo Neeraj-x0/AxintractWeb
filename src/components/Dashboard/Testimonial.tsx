@@ -12,7 +12,7 @@ const Testimonial = () => {
         </div>
         <p className="text-blue-100 mb-4 max-w-xl text-sm sm:text-base">
           &quot;Studies show that leads engaged within 5 minutes are 21x more likely
-          to convert. Leads Engager helped us reduce our average response time from
+          to convert. Axintract helped us reduce our average response time from
           hours to just 3 minutes.&quot;
         </p>
         <div className="flex items-center">
