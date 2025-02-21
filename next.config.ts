@@ -14,6 +14,9 @@ const nextConfig: NextConfig = {
       },
       {
         hostname : "api.axintract.com"
+      },
+      {
+        hostname: "cdn-icons-png.flaticon.com"
       }
     ],
   },

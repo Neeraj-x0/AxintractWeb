@@ -1,13 +1,23 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { AlertCircle, Save, Plus, Pencil, Trash } from "lucide-react";
+import {
+  AlertCircle,
+  Save,
+  Plus,
+  Pencil,
+  Trash,
+  Building,
+  Phone,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import { Label } from "@/components/label";
+import { Separator } from "@/components/ui/seperator";
 
 import usAxios from "@/lib";
+import SystemPromptForm from "@/components/chatBotPrompt";
 
 type NotificationType = "error" | "success";
 type ItemType = "category" | "status";
@@ -178,13 +188,13 @@ const SettingsPage: React.FC = () => {
     async (e: React.FormEvent) => {
       e.preventDefault();
       if (!profileImage) return;
-      
+
       const formdata = new FormData();
       formdata.append("file", profileImage);
       try {
         const response = await axios.put("/api/settings/profile", formdata, {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         });
         if (response.status === 200) {
@@ -322,149 +332,59 @@ const SettingsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8 transition-all duration-300 animate-fadeIn">
-      {/* Header */}
-      <header className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
-            Settings
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Overview and configuration of your application settings
-          </p>
-        </div>
-      </header>
-
       {/* Notification */}
       {notification.type && (
-        <Card
-          className={`mb-6 border-l-4 transition-all duration-300 animate-slideIn ${
-            notification.type === "error"
-              ? "border-red-500"
-              : "border-green-500"
+        <div
+          className={`mb-6 rounded-lg p-4 ${
+            notification.type === "error" ? "bg-red-50" : "bg-green-50"
           }`}
         >
-          <CardContent className="flex py-3">
-            <div className="flex items-center space-x-2">
-              <AlertCircle
-                className={`w-5 h-5 ${
-                  notification.type === "error"
-                    ? "text-red-600"
-                    : "text-green-600"
-                }`}
-              />
-              <span
-                className={`${
-                  notification.type === "error"
-                    ? "text-red-600"
-                    : "text-green-600"
-                } text-sm font-medium`}
-              >
-                {notification.message}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+          <div className="flex items-center">
+            <AlertCircle
+              className={`w-5 h-5 mr-2 ${
+                notification.type === "error"
+                  ? "text-red-500"
+                  : "text-green-500"
+              }`}
+            />
+            <span
+              className={`text-sm font-medium ${
+                notification.type === "error"
+                  ? "text-red-800"
+                  : "text-green-800"
+              }`}
+            >
+              {notification.message}
+            </span>
+          </div>
+        </div>
       )}
 
-      {/* Settings Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Categories */}
-        <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-semibold text-gray-800">
-              Categories
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {renderAddItemInput("category")}
-            {categories.length === 0 ? (
-              <p className="text-gray-500 text-sm italic mt-4">
-                No categories added yet
-              </p>
-            ) : (
-              renderItemList("category", categories)
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Statuses */}
-        <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-semibold text-gray-800">
-              Statuses
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {renderAddItemInput("status")}
-            {statuses.length === 0 ? (
-              <p className="text-gray-500 text-sm italic mt-4">
-                No statuses added yet
-              </p>
-            ) : (
-              renderItemList("status", statuses)
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* General Settings */}
-      <Card className="mt-6 shadow-sm hover:shadow-md transition-shadow duration-200">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg font-semibold text-gray-800">
-            General Settings
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={saveGeneralSettings} className="space-y-6">
-            <div className="space-y-2">
-              <Label
-                htmlFor="companyName"
-                className="text-sm font-medium text-gray-700"
-              >
-                Company Name
-              </Label>
-              <Input
-                id="companyName"
-                type="text"
-                placeholder="Enter company name"
-                value={businessProfile.companyName}
-                onChange={(e) =>
-                  setBusinessProfile((prev) => ({
-                    ...prev,
-                    companyName: e.target.value,
-                  }))
-                }
-                className="w-full"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700">
-                Company Logo
-              </Label>
-              <div className="flex flex-col items-center p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow transition-shadow duration-200">
+      {/* Profile Section */}
+      <div className="mb-8">
+        <Card className="overflow-hidden">
+          <div className="relative h-32 bg-gradient-to-r from-blue-600 to-indigo-600">
+            {/* Profile Image Overlay */}
+            <div className="absolute -bottom-12 left-8 flex items-end space-x-4">
+              <div className="relative h-24 w-24 border-4 border-white rounded-lg bg-white shadow-md">
                 {businessProfile.companyLogo ? (
-                  <div className="mb-3 relative h-16 w-16">
-                    <Image
-                      src={"https://api.axintract.com/media/"+businessProfile.companyLogo}
-                      alt="Company Logo"
-                      fill
-                      sizes="64px"
-                      className="object-contain"
-                    />
-                  </div>
+                  <Image
+                  src={businessProfile.companyLogo}
+                  alt="Company Logo"
+                  fill
+                  sizes="100%"
+                  className="object-cover rounded-lg"
+                  />
                 ) : (
-                  <div className="mb-3 h-16 w-16 flex items-center justify-center border border-dashed border-gray-300 rounded-md">
-                    <span className="text-gray-400 text-sm text-center">
-                      No logo
-                    </span>
+                  <div className="h-full w-full flex items-center justify-center bg-gray-100">
+                  <Building className="w-8 h-8 text-gray-400" />
                   </div>
                 )}
                 <label
                   htmlFor="logoUpload"
-                  className="cursor-pointer bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                  className="absolute -right-2 -bottom-2 p-1 bg-white rounded-full shadow-md cursor-pointer hover:bg-gray-50"
                 >
-                  Upload Logo
+                  <Pencil className="w-4 h-4 text-gray-600" />
                 </label>
                 <input
                   id="logoUpload"
@@ -488,42 +408,117 @@ const SettingsPage: React.FC = () => {
                 />
               </div>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label
-                htmlFor="phoneNumber"
-                className="text-sm font-medium text-gray-700"
-              >
-                Contact Number
-              </Label>
-              <Input
-                id="phoneNumber"
-                type="tel"
-                placeholder="Enter contact number"
-                value={businessProfile.phoneNumber}
-                onChange={(e) =>
-                  setBusinessProfile((prev) => ({
-                    ...prev,
-                    phoneNumber: e.target.value,
-                  }))
-                }
-                className="w-full"
-              />
-            </div>
+          <div className="pt-16 px-8 pb-8">
+            <form onSubmit={saveGeneralSettings}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="companyName">Company Name</Label>
+                  <div className="relative">
+                    <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    <Input
+                      id="companyName"
+                      type="text"
+                      placeholder="Enter company name"
+                      value={businessProfile.companyName}
+                      onChange={(e) =>
+                        setBusinessProfile((prev) => ({
+                          ...prev,
+                          companyName: e.target.value,
+                        }))
+                      }
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
 
-            <div className="flex justify-end pt-2">
-              <Button
-                type="submit"
-                className="bg-green-600 hover:bg-green-700 text-white transition-colors duration-200"
-                disabled={isLoading}
-              >
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+                <div className="space-y-2">
+                  <Label htmlFor="phoneNumber">Contact Number</Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    <Input
+                      id="phoneNumber"
+                      type="tel"
+                      placeholder="Enter contact number"
+                      value={businessProfile.phoneNumber}
+                      onChange={(e) =>
+                        setBusinessProfile((prev) => ({
+                          ...prev,
+                          phoneNumber: e.target.value,
+                        }))
+                      }
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <Button
+                  type="submit"
+                  className="bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
+                  disabled={isLoading}
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Profile
+                </Button>
+              </div>
+            </form>
+          </div>
+        </Card>
+      </div>
+
+      <Separator className="my-8" />
+
+      {/* Settings Section */}
+      <div className="space-y-6">
+        <h2 className="text-xl font-semibold text-gray-900">Settings</h2>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Categories Card */}
+          <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-gray-800">
+                Categories
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {renderAddItemInput("category")}
+              {categories.length === 0 ? (
+                <p className="text-gray-500 text-sm italic mt-4">
+                  No categories added yet
+                </p>
+              ) : (
+                renderItemList("category", categories)
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Statuses Card */}
+          <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-gray-800">
+                Statuses
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {renderAddItemInput("status")}
+              {statuses.length === 0 ? (
+                <p className="text-gray-500 text-sm italic mt-4">
+                  No statuses added yet
+                </p>
+              ) : (
+                renderItemList("status", statuses)
+              )}
+            </CardContent>
+          </Card>
+
+      
+        </div>
+            <Separator className="my-8" />
+          <SystemPromptForm />
+      </div>
     </div>
   );
 };

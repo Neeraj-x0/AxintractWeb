@@ -5,16 +5,18 @@ import { RootState } from "../app/redux/store";
 import { setActiveItem } from "../lib/features/activeTabSlice";
 import { AiOutlineUser } from "react-icons/ai";
 import { FaHouse } from "react-icons/fa6";
-import { 
-  Calendar, 
-  Settings, 
-  UsersIcon, 
-  Bot, 
-  ChevronLeft, 
+import {
+  Calendar,
+  Settings,
+  UsersIcon,
+  Bot,
+  ChevronLeft,
   ChevronRight,
   Menu
 } from "lucide-react";
 import { motion, AnimatePresence, MotionProps } from "framer-motion";
+import useAxios from "@/lib";
+import Image from "next/image";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -32,7 +34,14 @@ const Sidebar: React.FC<SidebarProps> = ({
   const dispatch = useDispatch();
   const activeItem = useSelector((state: RootState) => state.sidebar.activeItem);
   const [isMobile, setIsMobile] = useState(false);
-  
+  const [data, setData] = useState({
+    companyName: "",
+    companyLogo: "https://cdn-icons-png.flaticon.com/512/7153/7153150.png",
+  });
+  const axios = useAxios();
+
+
+
   const MotionDiv = motion.div as React.FC<React.HTMLAttributes<HTMLDivElement> & MotionProps>
   const MotionSpan = motion.span as React.FC<React.HTMLAttributes<HTMLSpanElement> & MotionProps>
 
@@ -51,6 +60,19 @@ const Sidebar: React.FC<SidebarProps> = ({
     return () => window.removeEventListener('resize', checkIfMobile);
   }, [onCollapsedChange, onSidebarOpenChange]);
 
+  useEffect(() => {
+    async function fetchLogo() {
+      try {
+        const response = await axios.get("/api/settings");
+        setData(response.data.businessProfile);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchLogo();
+  }, [axios, setData]);
+
+
   const menuItems = [
     { label: "Dashboard", icon: <FaHouse size={20} /> },
     { label: "Leads", icon: <AiOutlineUser size={20} /> },
@@ -60,6 +82,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     { label: "Chat Bot", icon: <Bot size={20} /> },
     { label: "Settings", icon: <Settings size={20} /> },
   ];
+
+
 
   const toggleSidebar = () => {
     if (isMobile) {
@@ -120,8 +144,8 @@ const Sidebar: React.FC<SidebarProps> = ({
               isMobile
                 ? "open"
                 : isCollapsed
-                ? "collapsed"
-                : "expanded"
+                  ? "collapsed"
+                  : "expanded"
             }
             exit={isMobile ? "closed" : "collapsed"}
             variants={isMobile ? mobileVariants : sidebarVariants}
@@ -131,7 +155,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               ${isMobile ? 'w-64' : ''}
             `}
           >
-            
+
             {/* Logo Section */}
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -142,8 +166,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                     exit={{ opacity: 0 }}
                     className="flex items-center space-x-2"
                   >
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg"></div>
-                    <span className="font-bold text-xl">Logo</span>
+                    <Image
+                      src={data.companyLogo}
+                      alt="Logo"
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                    />
+                    <span className="font-bold text-xl">{data.companyName}</span>
                   </MotionDiv>
                 )}
                 {!isMobile && (
@@ -170,10 +200,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                     className={`
                       group flex items-center space-x-2 p-2 rounded-lg cursor-pointer
                       transition-all duration-150 ease-in-out
-                      ${
-                        activeItem === item.label
-                          ? "bg-blue-50 text-blue-700"
-                          : "text-gray-600 hover:bg-gray-100"
+                      ${activeItem === item.label
+                        ? "bg-blue-50 text-blue-700"
+                        : "text-gray-600 hover:bg-gray-100"
                       }
                       ${isCollapsed && !isMobile ? "justify-center" : ""}
                     `}
