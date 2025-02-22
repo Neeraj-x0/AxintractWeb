@@ -1,4 +1,3 @@
-"use client";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../app/redux/store";
@@ -12,11 +11,13 @@ import {
   Bot,
   ChevronLeft,
   ChevronRight,
-  Menu
+  Menu,
+  Search
 } from "lucide-react";
-import { motion, AnimatePresence, MotionProps } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import useAxios from "@/lib";
 import Image from "next/image";
+import { MotionDiv, MotionSpan } from "./MotionComponents";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -34,16 +35,23 @@ const Sidebar: React.FC<SidebarProps> = ({
   const dispatch = useDispatch();
   const activeItem = useSelector((state: RootState) => state.sidebar.activeItem);
   const [isMobile, setIsMobile] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [data, setData] = useState({
     companyName: "",
     companyLogo: "https://cdn-icons-png.flaticon.com/512/7153/7153150.png",
+    name: ""
   });
   const axios = useAxios();
 
-
-
-  const MotionDiv = motion.div as React.FC<React.HTMLAttributes<HTMLDivElement> & MotionProps>
-  const MotionSpan = motion.span as React.FC<React.HTMLAttributes<HTMLSpanElement> & MotionProps>
+  const menuItems = [
+    { label: "Dashboard", icon: <FaHouse size={18} /> },
+    { label: "Leads", icon: <AiOutlineUser size={18} /> },
+    { label: "Reminders", icon: <Calendar size={18} /> },
+    { label: "Engagements", icon: <UsersIcon size={18} /> },
+    { label: "Follow Ups", icon: <UsersIcon size={18} /> },
+    { label: "Chat Bot", icon: <Bot size={18} /> },
+    { label: "Settings", icon: <Settings size={18} /> },
+  ];
 
   useEffect(() => {
     const checkIfMobile = () => {
@@ -70,20 +78,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       }
     }
     fetchLogo();
-  }, [axios, setData]);
-
-
-  const menuItems = [
-    { label: "Dashboard", icon: <FaHouse size={20} /> },
-    { label: "Leads", icon: <AiOutlineUser size={20} /> },
-    { label: "Reminders", icon: <Calendar size={20} /> },
-    { label: "Engagements", icon: <UsersIcon size={20} /> },
-    { label: "Follow Ups", icon: <UsersIcon size={20} /> },
-    { label: "Chat Bot", icon: <Bot size={20} /> },
-    { label: "Settings", icon: <Settings size={20} /> },
-  ];
-
-
+  }, [axios]);
 
   const toggleSidebar = () => {
     if (isMobile) {
@@ -93,39 +88,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const sidebarVariants = {
-    expanded: {
-      width: "256px",
-      transition: { duration: 0.3 },
-    },
-    collapsed: {
-      width: "72px",
-      transition: { duration: 0.3 },
-    },
-  };
-
-  const mobileVariants = {
-    open: {
-      x: 0,
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 30,
-      },
-    },
-    closed: {
-      x: "-100%",
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 30,
-      },
-    },
-  };
-
   return (
     <>
-      {/* Mobile Hamburger Button */}
       {isMobile && (
         <button
           onClick={toggleSidebar}
@@ -135,29 +99,21 @@ const Sidebar: React.FC<SidebarProps> = ({
         </button>
       )}
 
-      {/* Sidebar */}
       <AnimatePresence>
         {(!isMobile || isSidebarOpen) && (
           <MotionDiv
-            initial={isMobile ? "closed" : "expanded"}
+            initial={isMobile ? { x: "-100%" } : { width: "256px" }}
             animate={
               isMobile
-                ? "open"
-                : isCollapsed
-                  ? "collapsed"
-                  : "expanded"
+                ? { x: 0 }
+                : { width: isCollapsed ? "72px" : "256px" }
             }
-            exit={isMobile ? "closed" : "collapsed"}
-            variants={isMobile ? mobileVariants : sidebarVariants}
-            className={`
-              fixed left-0 top-0 h-full bg-white border-r border-gray-200
-              flex flex-col z-40 shadow-xl
-              ${isMobile ? 'w-64' : ''}
-            `}
+            exit={isMobile ? { x: "-100%" } : { width: "72px" }}
+            transition={{ duration: 0.3 }}
+            className="fixed left-0 top-0 h-full bg-white border-r border-gray-200 flex flex-col z-40 shadow-sm"
           >
-
             {/* Logo Section */}
-            <div className="p-4 border-b border-gray-200">
+            <div className="p-3 border-b border-gray-100">
               <div className="flex items-center justify-between">
                 {!isCollapsed && (
                   <MotionDiv
@@ -169,49 +125,68 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <Image
                       src={data.companyLogo}
                       alt="Logo"
-                      width={32}
-                      height={32}
+                      width={24}
+                      height={24}
                       className="rounded-full"
                     />
-                    <span className="font-bold text-xl">{data.companyName}</span>
+                    <span className="font-medium text-sm">{data.companyName}</span>
                   </MotionDiv>
                 )}
                 {!isMobile && (
                   <button
                     onClick={toggleSidebar}
-                    className="p-2 rounded-lg hover:bg-gray-100 focus:outline-none"
+                    className="p-1.5 rounded-md hover:bg-gray-50 focus:outline-none"
                   >
                     {isCollapsed ? (
-                      <ChevronRight size={20} />
+                      <ChevronRight size={16} />
                     ) : (
-                      <ChevronLeft size={20} />
+                      <ChevronLeft size={16} />
                     )}
                   </button>
                 )}
               </div>
             </div>
 
+            {/* Search Bar */}
+            {(!isCollapsed || isMobile) && (
+              <div className="px-3 py-2">
+                <div className="relative">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="w-full pl-8 pr-3 py-2 text-sm bg-gray-50 rounded-md border border-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Menu Items */}
-            <div className="flex-1 overflow-y-hidden py-4">
-              <div className="space-y-1 px-3">
+            <div className="flex-1 overflow-y-auto py-2">
+              <div className="space-y-0.5 px-3">
                 {menuItems.map((item) => (
                   <div
                     key={item.label}
                     className={`
-                      group flex items-center space-x-2 p-2 rounded-lg cursor-pointer
+                      group flex items-center space-x-2 px-2 py-1.5 rounded-lg cursor-pointer
                       transition-all duration-150 ease-in-out
                       ${activeItem === item.label
-                        ? "bg-blue-50 text-blue-700"
-                        : "text-gray-600 hover:bg-gray-100"
+                        ? "bg-gray-100 text-gray-900 shadow-sm  text-lg font-semibold"
+                        : "text-gray-700 hover:bg-gray-50"
                       }
                       ${isCollapsed && !isMobile ? "justify-center" : ""}
                     `}
                     onClick={() => dispatch(setActiveItem(item.label))}
                   >
-                    <div className="relative flex items-center">
+                    <div className={`relative flex items-center${activeItem === item.label
+                      ? "text-gray-900  text-lg font-semibold"
+                      : "text-gray-700 hover:bg-gray-50"
+                      }`}>
                       {item.icon}
                       {isCollapsed && !isMobile && (
-                        <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 whitespace-nowrap z-50">
+                        <div className="fixed ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-50 translate-x-[35px]">
                           {item.label}
                         </div>
                       )}
@@ -221,6 +196,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
+                        className="text-sm"
                       >
                         {item.label}
                       </MotionSpan>
@@ -230,17 +206,23 @@ const Sidebar: React.FC<SidebarProps> = ({
               </div>
             </div>
 
-            {/* User Profile Section */}
-            <div className="border-t border-gray-200 p-4">
+            {/* User Profile */}
+            <div className="border-t border-gray-100 p-3">
               <div className={`flex items-center ${isCollapsed && !isMobile ? "justify-center" : "space-x-3"}`}>
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
+                <Image
+                  src={data.companyLogo}
+                  alt="Logo"
+                  width={24}
+                  height={24}
+                  className="rounded-full"
+                />  
                 {(!isCollapsed || isMobile) && (
                   <MotionDiv
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    <div className="text-sm font-medium">John Doe</div>
+                    <div className="text-sm font-medium">{data.name}</div>
                     <div className="text-xs text-gray-500">Admin</div>
                   </MotionDiv>
                 )}
@@ -250,7 +232,6 @@ const Sidebar: React.FC<SidebarProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Overlay for mobile */}
       {isMobile && isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-30"
