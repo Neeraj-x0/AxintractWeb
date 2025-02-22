@@ -6,7 +6,8 @@ import { toast } from 'react-hot-toast';
 export const useEngagements = () => {
   const axios = useAxios();
   const [loading, setLoading] = useState(false);
-  const [engagements, setEngagements] = useState<IEngagement[]>([]);
+  const [engagements, setEngagements] = useState<{ engagements: IEngagement[] }>(
+    { engagements: [] });
 
   const fetchEngagements = useCallback(async () => {
     try {
@@ -27,13 +28,13 @@ export const useEngagements = () => {
       toast.success("Engagement created successfully");
       await fetchEngagements();
       return true;
-    } catch  {
+    } catch {
       toast.error("Failed to create engagement");
       return false;
     } finally {
       setLoading(false);
     }
-  }, [fetchEngagements,axios]);
+  }, [fetchEngagements, axios]);
 
   const handleBulkAction = useCallback(async (
     action: "status" | "category" | "delete",
@@ -50,15 +51,15 @@ export const useEngagements = () => {
         toast.success(`Engagements ${action} updated successfully`);
       }
       await fetchEngagements();
-    } catch  {
+    } catch {
       toast.error(`Failed to ${action} engagements`);
     } finally {
       setLoading(false);
     }
-  }, [fetchEngagements,axios]);
+  }, [fetchEngagements, axios]);
 
   return {
-    engagements,
+    engagements: engagements.engagements,
     loading,
     fetchEngagements,
     handleAddEngagement,

@@ -91,8 +91,8 @@ const EngagementDashboard: React.FC = () => {
       setSelectedIds(
         checked
           ? filteredEngagements
-              .filter((e) => e._id !== undefined)
-              .map((e) => e._id!.toString())
+            .filter((e) => e._id !== undefined)
+            .map((e) => e._id!.toString())
           : []
       );
     },

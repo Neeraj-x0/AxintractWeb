@@ -19,6 +19,7 @@ export const useFilters = (engagements: IEngagement[]) => {
   }, []);
 
   const filteredEngagements = useMemo(() => {
+    console.log(engagements);
     return engagements.filter((engagement) => {
       const matchesSearch =
         !searchQuery ||
